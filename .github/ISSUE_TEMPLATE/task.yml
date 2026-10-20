@@ -1,0 +1,62 @@
+name: Задача
+description: Новая задача для команды (функциональность, дизайн, документация, настройка)
+title: "[Задача] "
+projects: ["study-ai-assistant/1"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Опишите задачу так, чтобы её мог взять любой участник команды без дополнительных вопросов.
+        Задача должна укладываться в 1–2 дня работы. Если больше — разбейте её на несколько.
+  - type: textarea
+    id: description
+    attributes:
+      label: Описание
+      description: Что нужно сделать и зачем
+      placeholder: Нужно сделать экран загрузки материала, чтобы пользователь мог выбрать файл...
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Критерии приёмки
+      description: По каким признакам понятно, что задача выполнена. Каждый пункт — отдельная галочка.
+      value: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+  - type: input
+    id: reference
+    attributes:
+      label: Макет Figma / контракт API
+      description: Ссылка на фрейм в Figma или на описание эндпоинта в openapi.yaml. Для задач дизайна и mobile ссылка на фрейм обязательна.
+      placeholder: https://www.figma.com/design/...
+  - type: dropdown
+    id: size
+    attributes:
+      label: Размер
+      description: "S — до полудня, M — около дня, L — до 2 дней (лучше разбить)"
+      options:
+        - S
+        - M
+        - L
+    validations:
+      required: true
+  - type: dropdown
+    id: team
+    attributes:
+      label: Подкоманда
+      options:
+        - Design
+        - Mobile
+        - Backend
+        - Общая
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Зависимости
+      description: От каких задач зависит эта задача (например, "зависит от #3"). Если не зависит — оставьте пустым.
+      placeholder: "- зависит от #3"

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Вопрос по проекту
+    url: https://github.com/study-ai-assistant/backend/wiki
+    about: Сначала загляните в wiki. Если ответа нет — задайте вопрос в чате команды.

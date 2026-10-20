@@ -1,0 +1,56 @@
+# ЗАГОТОВКА CI.
+# Сейчас проверяет только наличие обязательных файлов.
+# Линтер и тесты закомментированы: включить после выбора стека (см. docs/STACK_PROPOSAL.md в backend).
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  required-files:
+    name: Обязательные файлы
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Проверить наличие обязательных файлов
+        run: |
+          missing=0
+          for f in README.md CONTRIBUTING.md; do
+            if [ -f "$f" ]; then
+              echo "OK: $f"
+            else
+              echo "::error::Не найден обязательный файл: $f"
+              missing=1
+            fi
+          done
+          exit $missing
+
+  # ВКЛЮЧИТЬ ПОСЛЕ ВЫБОРА СТЕКА: линтер.
+  # Раскомментировать и заменить шаги установки и запуска на команды выбранного стека.
+  # lint:
+  #   name: Линтер
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v5
+  #     # - name: Установить окружение
+  #     #   uses: <action для выбранного стека>
+  #     # - name: Запустить линтер
+  #     #   run: <команда линтера>
+
+  # ВКЛЮЧИТЬ ПОСЛЕ ВЫБОРА СТЕКА: тесты.
+  # tests:
+  #   name: Тесты
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v5
+  #     # - name: Установить окружение
+  #     #   uses: <action для выбранного стека>
+  #     # - name: Запустить тесты
+  #     #   run: <команда тестов>

@@ -1,7 +1,9 @@
 # Предложение по выбору стека
 
-**Статус:** предложение. Решение принимает руководитель проекта.
-**Дата проверки данных:** 21 октября 2026 г. Версии взяты из официальных реестров пакетов (PyPI, npm, Maven Central, архив Flutter), сроки поддержки — с endoflife.date.
+**Статус:** предложение. Решение о стеке принимают сами команды: **mobile** — для мобильного приложения, **backend** — для сервера.
+**Дата проверки данных:** 21 октября 2026 г. Версии взяты из официальных реестров пакетов (Google Maven, Maven Central, PyPI, npm, архив Flutter), сроки поддержки — с endoflife.date.
+
+**Рекомендуемый стек для mobile — нативная Android-разработка на Kotlin (Kotlin + Jetpack Compose).**
 
 ## Что нам нужно от стека
 
@@ -15,7 +17,19 @@
 
 ## Mobile
 
-### Вариант M1. Flutter (язык Dart)
+### Вариант M1. Нативная Android-разработка: Kotlin + Jetpack Compose — **рекомендуется**
+
+| Критерий | Оценка |
+|---|---|
+| Актуальность | Kotlin **2.4.21**, Jetpack Compose BOM **2026.09.00**, Android Gradle Plugin **9.4.1**, актуальная платформа — Android 17 (API 37). Kotlin и Jetpack Compose — официально рекомендуемые Google язык и UI-инструментарий для Android. Не использовать устаревшие подходы: XML-разметку экранов (вместо неё Compose), `kapt` (вместо него KSP), Groovy-скрипты Gradle (вместо них Kotlin DSL и version catalog). |
+| Порог входа | Средний. Kotlin — современный и понятный язык; Android Studio сразу содержит всё нужное (SDK, эмулятор, шаблоны проектов, предпросмотр Compose). Сложнее всего на старте — Gradle и жизненный цикл Android. |
+| Популярность | Основной способ разработки под Android; Kotlin используется в большинстве приложений из Google Play. |
+| Обучающие материалы | Очень много: бесплатный официальный курс Google «Android Basics with Compose», codelabs, developer.android.com, много материалов на русском. |
+| CI и запуск | `actions/setup-java` + Gradle Wrapper: `./gradlew lint`, `./gradlew test`, `./gradlew assembleDebug` — стандартные команды, macOS не нужен. Запуск — эмулятор в Android Studio или телефон с отладкой по USB. |
+| Соответствие задаче | Хорошее: HTTP-клиенты Retrofit **3.0.0** / OkHttp **5.5.0** или Ktor Client **3.6.0**, `kotlinx.serialization` **1.12.0**, выбор файлов через системный Storage Access Framework, Navigation Compose, ViewModel. |
+| Риски | **Только Android, iOS не поддерживается.** Если позже понадобится iOS, общий Kotlin-код можно вынести в Kotlin Multiplatform. Первая сборка Gradle и установка Android SDK занимают время — закладывать в Спринт 1. |
+
+### Вариант M2. Flutter (язык Dart)
 
 | Критерий | Оценка |
 |---|---|
@@ -25,9 +39,9 @@
 | Обучающие материалы | Очень много: официальные codelabs, docs.flutter.dev, курсы, много материалов на русском. |
 | CI и запуск | `flutter analyze`, `flutter test`, сборка APK в GitHub Actions — готовый action `subosito/flutter-action`. Для запуска нужен Android Studio с эмулятором или телефон с отладкой по USB. |
 | Соответствие задаче | Хорошее: HTTP-клиенты `http` (1.6.0) и `dio` (5.11.1), выбор файлов (`file_picker`), Android и iOS из одного кода. |
-| Риски | Новый для команды язык Dart. Установка Android SDK на 4–5 ноутбуков может занять первый спринт. |
+| Риски | Язык Dart почти не используется вне Flutter. Установка Android SDK всё равно нужна. |
 
-### Вариант M2. React Native + Expo (язык TypeScript)
+### Вариант M3. React Native + Expo (язык TypeScript)
 
 | Критерий | Оценка |
 |---|---|
@@ -38,18 +52,6 @@
 | CI и запуск | `npm ci`, ESLint, Jest в GitHub Actions — стандартный `actions/setup-node`. Облачные сборки EAS Build (бесплатный лимит). |
 | Соответствие задаче | Хорошее: `fetch`, `expo-document-picker` для выбора файлов. |
 | Риски | Быстрый цикл релизов, требуется Node.js 22.13+ / 24.3+. Сторонние библиотеки иногда отстают от новых версий — проверять по React Native Directory. |
-
-### Вариант M3. Kotlin Multiplatform + Compose Multiplatform (язык Kotlin)
-
-| Критерий | Оценка |
-|---|---|
-| Актуальность | Kotlin **2.4.21**, Compose Multiplatform **1.12.2**. Поддержка iOS стабильна с версии 1.8.0 (май 2025). Развивается JetBrains и Google (Android официально рекомендует Kotlin и Jetpack Compose). |
-| Порог входа | Средний–высокий: Gradle, структура мультиплатформенного проекта, для iOS нужен Mac. |
-| Популярность | ~19 тыс. звёзд у Compose Multiplatform; Jetpack Compose — стандарт нативной Android-разработки. |
-| Обучающие материалы | Много по Kotlin и Jetpack Compose, заметно меньше именно по мультиплатформе. |
-| CI и запуск | `actions/setup-java` + Gradle; сборка Android простая, iOS — только на macOS-раннерах. |
-| Соответствие задаче | Хорошее: Ktor Client, kotlinx.serialization. |
-| Риски | Самый высокий порог входа из трёх; меньше готовых ответов на типовые вопросы новичков. |
 
 ---
 
@@ -76,7 +78,7 @@
 | Популярность | NestJS ~77 тыс. звёзд; экосистема npm — самая большая. |
 | Обучающие материалы | Много, официальная документация хорошая, но NestJS 12 вышел недавно — часть материалов про v10–11 (отличия невелики, кроме ESM). |
 | CI и запуск | `actions/setup-node`, `npm ci`, ESLint/oxlint, Vitest. |
-| Соответствие задаче | Хорошее: пакет `@nestjs/swagger` генерирует OpenAPI, официальные TypeScript SDK LLM-провайдеров. **Плюс:** если mobile выберет React Native, вся команда пишет на одном языке (TypeScript) и может делить типы. |
+| Соответствие задаче | Хорошее: пакет `@nestjs/swagger` генерирует OpenAPI, официальные TypeScript SDK LLM-провайдеров. |
 | Риски | Больше шаблонного кода; ошибки конфигурации TypeScript/ESM типичны для новичков. |
 
 ### Вариант B3. Kotlin + Ktor (или Spring Boot)
@@ -88,7 +90,7 @@
 | Популярность | Spring Boot ~82 тыс. звёзд — стандарт в индустрии; Ktor ~15 тыс. |
 | Обучающие материалы | По Spring — очень много; по Ktor — средне. |
 | CI и запуск | `actions/setup-java` + Gradle; первая сборка долгая. |
-| Соответствие задаче | Хорошее. **Плюс:** если mobile выберет Kotlin Multiplatform, у команды один язык. Для OpenAPI нужны дополнительные плагины. |
+| Соответствие задаче | Хорошее. **Плюс:** при рекомендуемом нативном Android на Kotlin у всей команды разработки один язык, а модели запросов и ответов можно описывать одинаково (`kotlinx.serialization`). Для OpenAPI нужны дополнительные плагины. |
 | Риски | Тяжелее окружение (JDK, Gradle), дольше старт для новичков. |
 
 ---
@@ -99,27 +101,37 @@
 
 | | Актуальность и поддержка | Порог входа (выше — проще) | Популярность | Материалы | Простота CI и запуска | Соответствие задаче |
 |---|---|---|---|---|---|---|
-| **M1. Flutter** | ●●● | ●●● | ●●● | ●●● | ●● | ●●● |
-| **M2. React Native + Expo** | ●●● | ●●● | ●●● | ●●● | ●●● | ●●● |
-| **M3. Kotlin / Compose Multiplatform** | ●●● | ● | ●● | ●● | ●● | ●●● |
+| **M1. Нативный Android (Kotlin + Compose)** ⭐ | ●●● | ●● | ●●● | ●●● | ●●● | ●●● |
+| **M2. Flutter** | ●●● | ●●● | ●●● | ●●● | ●● | ●●● |
+| **M3. React Native + Expo** | ●●● | ●●● | ●●● | ●●● | ●●● | ●●● |
 | **B1. Python + FastAPI** | ●●● | ●●● | ●●● | ●●● | ●●● | ●●● |
 | **B2. TypeScript + NestJS** | ●●● | ●● | ●●● | ●●● | ●●● | ●●● |
-| **B3. Kotlin + Ktor / Spring Boot** | ●●● | ● | ●● | ●● | ●● | ●● |
+| **B3. Kotlin + Ktor / Spring Boot** | ●●● | ● | ●● | ●● | ●● | ●●● |
 
-Все шесть вариантов актуальны и не deprecated — разница в пороге входа и удобстве для нашей задачи.
+Все варианты актуальны и не deprecated — разница в пороге входа и удобстве для нашей задачи.
 
 ## Рекомендация
 
-**Основная пара: Flutter (mobile) + Python/FastAPI (backend).**
+### Mobile: нативная Android-разработка на Kotlin (M1)
 
-- **FastAPI** — самый низкий порог входа для backend, автоматическая генерация OpenAPI прямо поддерживает подход «сначала контракт», лучшие библиотеки для разбора PDF/DOCX, официальные SDK всех LLM-провайдеров.
-- **Flutter** — один язык и один подход к UI, отличная официальная документация и инструменты, стабильный цикл релизов, Android и iOS из одного кода.
+- Официально рекомендуемый Google подход к Android-разработке: Kotlin + Jetpack Compose, без промежуточных кросс-платформенных слоёв.
+- Лучшие официальные учебные материалы (бесплатный курс «Android Basics with Compose») и инструменты: Android Studio сразу даёт эмулятор, шаблоны и предпросмотр экранов.
+- Kotlin — востребованный язык, знания пригодятся и за пределами проекта (в том числе на backend).
+- Ограничение: приложение будет только под Android. Для учебного проекта и демонстрации на защите этого достаточно; при необходимости iOS позже можно перейти к Kotlin Multiplatform.
 
-**Альтернатива: «всё на TypeScript» — React Native + Expo и NestJS (или Fastify).** Стоит выбрать, если большинство команды уже знает JavaScript/TypeScript: один язык на всю команду, общие типы для API, а Expo Go избавляет от установки Android Studio на первом спринте.
+### Backend: Python + FastAPI (B1)
 
-Kotlin-варианты (M3, B3) не рекомендуются для этой команды из-за порога входа при сроке 6 недель.
+- Самый низкий порог входа, автоматическая генерация OpenAPI прямо поддерживает подход «сначала контракт», лучшие библиотеки для разбора PDF/DOCX, официальные SDK всех LLM-провайдеров.
+- Альтернатива — **Kotlin + Ktor (B3)**, если команда backend хочет один язык с mobile: выше порог входа, но общий язык и инструменты (Gradle, IntelliJ IDEA / Android Studio) со всей командой разработки.
 
-**Решение:** ЗАПОЛНИТЬ (руководитель проекта, до конца Спринта 1).
+### Кто принимает решение
+
+| Часть | Решает | Решение |
+|---|---|---|
+| Mobile | команда **mobile** | ЗАПОЛНИТЬ |
+| Backend | команда **backend** | ЗАПОЛНИТЬ |
+
+Решение записывается в эту таблицу через Pull Request до конца Спринта 1.
 
 ---
 
@@ -127,10 +139,10 @@ Kotlin-варианты (M3, B3) не рекомендуются для этой
 
 | Что | Где | Комментарий |
 |---|---|---|
-| CI: линтер и тесты | `.github/workflows/ci.yml` в обоих репозиториях | Раскомментировать блоки `lint` и `tests`, подставить action окружения и команды. После этого сделать проверки обязательными в ruleset `main`. |
-| `.gitignore` | оба репозитория | Добавить правила стека (например, `__pycache__/`, `.venv/` для Python; `.dart_tool/`, `build/` для Flutter; `node_modules/` для Node.js). |
-| Структура папок | оба репозитория, README | Создать каркас проекта (`app/`, `tests/` и т. п.) и описать структуру в README. |
-| Зависимости | backend / mobile | Файл зависимостей с закреплёнными версиями (`pyproject.toml` + lock-файл / `pubspec.yaml` + `pubspec.lock` / `package.json` + `package-lock.json`). |
+| CI: линтер и тесты | `.github/workflows/ci.yml` в обоих репозиториях | Раскомментировать блоки `lint` и `tests`, подставить action окружения и команды (для нативного Android: `actions/setup-java`, `./gradlew lint test`). После этого сделать проверки обязательными в ruleset `main`. |
+| `.gitignore` | оба репозитория | Добавить правила стека (для нативного Android: `.gradle/`, `build/`, `local.properties`, `*.apk`, `*.keystore`, `captures/`; для Python: `__pycache__/`, `.venv/`). |
+| Структура папок | оба репозитория, README | Создать каркас проекта (для Android — проект из шаблона Empty Activity в Android Studio) и описать структуру в README. |
+| Зависимости | backend / mobile | Закреплённые версии (для Android — `gradle/libs.versions.toml` + Gradle Wrapper; для Python — `pyproject.toml` + lock-файл). |
 | Docker Compose | backend | `docker-compose.yml` для локального запуска сервера с `.env`. |
 | `.env.example` | backend | Уточнить переменные под выбранного LLM-провайдера и фреймворк. |
 | Быстрый старт | README обоих репозиториев | Заполнить раздел «Быстрый старт». |
@@ -139,11 +151,13 @@ Kotlin-варианты (M3, B3) не рекомендуются для этой
 
 ## Источники
 
+- Google Maven (Jetpack Compose BOM, Android Gradle Plugin): https://maven.google.com/
+- Kotlin и Jetpack Compose для Android: https://developer.android.com/kotlin и https://developer.android.com/compose
+- Курс «Android Basics with Compose»: https://developer.android.com/courses/android-basics-compose/course
 - Архив релизов Flutter: https://docs.flutter.dev/install/archive
 - Реестр npm (react-native, expo, @nestjs/core, fastify, express): https://www.npmjs.com/
 - PyPI (fastapi, pydantic): https://pypi.org/project/fastapi/
-- Maven Central (Kotlin, Compose Multiplatform, Ktor, Spring Boot): https://central.sonatype.com/
-- Сроки поддержки Python, Node.js, Spring Boot, React Native: https://endoflife.date/
-- Compose Multiplatform 1.8.0 — стабильная поддержка iOS: https://blog.jetbrains.com/kotlin/2025/05/compose-multiplatform-1-8-0-released-compose-multiplatform-for-ios-is-stable-and-production-ready/
+- Maven Central (Kotlin, Ktor, Spring Boot, Retrofit, OkHttp): https://central.sonatype.com/
+- Сроки поддержки Python, Node.js, Spring Boot, Android: https://endoflife.date/
 - Kotlin в Spring Boot 4: https://spring.io/blog/2025/12/18/next-level-kotlin-support-in-spring-boot-4/
 - Планы NestJS 12: https://www.infoq.com/news/2026/04/nestjs-12-roadmap-esm

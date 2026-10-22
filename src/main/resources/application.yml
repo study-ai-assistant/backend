@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: backend
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 30MB
+  mvc:
+    problemdetails:
+      enabled: true
+server:
+  port: ${APP_PORT:8080}
+  error:
+    include-message: never
+    include-stacktrace: never
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+# Зарезервировано для будущего LlmClient; ключ не нужен для запуска скелета.
+app:
+  llm:
+    api-key: ${LLM_API_KEY:}
+    base-url: ${LLM_BASE_URL:}
+    model: ${LLM_MODEL:}

@@ -8,12 +8,17 @@
 (правой кнопкой → Add as Maven Project) и выберите Project SDK 21.
 Запустите `BackendApplication` или конфигурацию `Backend`.
 Ключи задаются в Run → Edit Configurations → Environment variables.
-`.env.example` — только пример; файл `.env` автоматически не читается.
+Файл `.env` в корне проекта читается автоматически при запуске из этой папки.
 Для запуска скелета ключ не требуется.
 
-## Команды
+## Быстрый старт
+
+Установите JDK 21 и проверьте `java -version`. Maven отдельно устанавливать
+не нужно: Wrapper скачает Maven и зависимости при первом запуске.
+Откройте терминал в корне `backend`:
 
 ```bash
+cp .env.example .env
 ./mvnw verify
 ./mvnw spring-boot:run
 # либо после сборки:
@@ -22,10 +27,23 @@ java -jar target/backend-0.0.1-SNAPSHOT.jar
 
 Нужны JDK 21 и доступ к Maven Central при первой сборке. Windows: `mvnw.cmd`.
 Порт по умолчанию 8080, переопределяется переменной `APP_PORT`.
+Настройки читаются из окружения процесса и локального `.env` (окружение имеет
+приоритет). `.env` использует формат `KEY=value` без `export` и кавычек,
+игнорируется Git и не обязателен для запуска. Запускайте сервер из корня проекта.
+В PowerShell скопируйте пример командой `Copy-Item .env.example .env`.
+
+Проверка после запуска:
+
+```bash
+curl -i http://localhost:8080/health
+```
+
+Ожидается HTTP 200 и JSON `{"status":"ok"}`. Сервер работает без ключа LLM.
 
 ## API
 
-- `GET /actuator/health` — состояние сервера.
+- `GET /health` — тестовый эндпоинт для мобильного клиента: `{"status":"ok"}`.
+- `GET /actuator/health` — техническая проверка Spring Boot.
 - `GET /api/v1/modes` — пять доступных идентификаторов режимов.
 - `POST /api/v1/materials/process` — multipart: повторяющееся поле `files`, поле `mode`.
 
@@ -42,7 +60,27 @@ curl -F 'files=@lecture.txt' -F 'mode=SHORT_SUMMARY' http://localhost:8080/api/v
 Ограничения: 10 MB на файл, 30 MB на запрос; превышение — `413`.
 Ошибки API имеют формат Problem Details. Контракт: `docs/api/openapi.yaml`.
 
-## Структура и следующие шаги
+## Структура папок
+
+```text
+backend/
+├── .github/workflows/       # CI: сборка и тесты
+├── .mvn/ и mvnw*            # Maven Wrapper
+├── .run/                    # конфигурация запуска IntelliJ IDEA
+├── docs/api/                # контракт OpenAPI
+├── src/main/java/ru/studyassistant/backend/
+│   ├── BackendApplication.java
+│   ├── health/              # GET /health
+│   ├── material/            # API материалов и режимы
+│   ├── extraction/          # интерфейс извлечения текста
+│   └── llm/                 # интерфейс внешнего LLM
+├── src/main/resources/      # application.yml
+├── src/test/java/           # интеграционные HTTP-тесты
+├── .env.example             # пример локальных настроек
+└── pom.xml                  # зависимости и сборка Maven
+```
+
+## Следующие шаги
 
 - `material` — контроллер, сервис, режимы и модель результата.
 - `extraction/TextExtractor` — интерфейс будущих парсеров TXT, DOCX, PDF.

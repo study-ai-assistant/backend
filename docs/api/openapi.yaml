@@ -6,6 +6,24 @@ info:
 servers:
   - url: http://localhost:8080
 paths:
+  /health:
+    get:
+      summary: Проверить доступность сервера
+      operationId: health
+      responses:
+        '200':
+          description: Сервер работает; ключ LLM не требуется
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+              example:
+                status: ok
   /actuator/health:
     get:
       responses:

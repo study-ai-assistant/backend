@@ -17,6 +17,11 @@ class BackendApplicationTests {
 
     @Test
     void healthAndModesAreAvailableWithoutLlmCredentials() throws Exception {
+        var publicHealth = get("/health");
+        assertThat(publicHealth.statusCode()).isEqualTo(200);
+        assertThat(publicHealth.headers().firstValue("Content-Type").orElse(""))
+                .startsWith("application/json");
+        assertThat(publicHealth.body()).isEqualTo("{\"status\":\"ok\"}");
         var health = get("/actuator/health");
         assertThat(health.statusCode()).isEqualTo(200);
         assertThat(health.body()).contains("UP");

@@ -1,18 +1,24 @@
 openapi: 3.0.3
 info:
-  title: Study Assistant Backend
-  version: 0.0.1
-  description: Скелет API. Извлечение текста и вызов LLM пока не реализованы.
+  title: ИИ-помощник для учёбы — API
+  version: 0.1.0
+  description: |
+    Черновик для согласования с mobile (задача #4).
+    GET /health и GET /api/v1/modes реализованы.
+    POST /api/v1/text/process — планируемый контракт: реализация относится к #8
+    и в этой ветке отсутствует. Примеры результата не являются реальными ответами LLM.
+    Загрузка файлов относится к следующему спринту и в этот контракт не входит.
 servers:
   - url: http://localhost:8080
+    description: Локальный сервер
 paths:
   /health:
     get:
-      summary: Проверить доступность сервера
       operationId: health
+      summary: Проверить доступность сервера
       responses:
         '200':
-          description: Сервер работает; ключ LLM не требуется
+          description: Сервер работает без ключа LLM
           content:
             application/json:
               schema:
@@ -24,62 +30,139 @@ paths:
                     enum: [ok]
               example:
                 status: ok
-  /actuator/health:
-    get:
-      responses:
-        '200':
-          description: Сервер работает
   /api/v1/modes:
     get:
+      operationId: listModes
+      summary: Все идентификаторы режимов; не означает готовность их обработки
       responses:
         '200':
-          description: Режимы обработки
+          description: Пять режимов
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProcessingMode'
-  /api/v1/materials/process:
+              example: [SHORT_SUMMARY, DETAILED_SUMMARY, SIMPLE_EXPLANATION, SELF_CHECK_QUESTIONS, KEY_TERMS]
+  /api/v1/text/process:
     post:
-      description: Заглушка; непустые файлы пока приводят к ответу 501.
+      operationId: processText
+      summary: Обработать учебный текст (планируется в задаче №8)
+      description: |
+        Синхронный запрос, UTF-8. В первой реализации поддерживается SHORT_SUMMARY;
+        остальные известные режимы пока должны возвращать 400.
+        text содержит от 1 до 10000 Unicode-символов и хотя бы один непробельный символ.
+        Лимит применяется к декодированному text, не к размеру JSON в байтах.
+        Токенный лимит провайдера проверяется отдельно при реализации #8.
+        Клиенту рекомендуется таймаут 90 секунд; серверный вызов LLM — не более 60 секунд.
+        Автоматический повтор POST не гарантирует отсутствие повторной обработки.
+        В текущем скелете этот маршрут отсутствует (404).
+      x-implementation-status: planned
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
-              type: object
-              required: [files, mode]
-              properties:
-                files:
-                  type: array
-                  minItems: 1
-                  items:
-                    type: string
-                    format: binary
-                mode:
-                  $ref: '#/components/schemas/ProcessingMode'
+              $ref: '#/components/schemas/ProcessTextRequest'
+            example:
+              text: Митохондрии обеспечивают клетку энергией в процессе клеточного дыхания.
+              mode: SHORT_SUMMARY
       responses:
         '200':
-          description: Зарезервировано для будущей реализации
+          description: Результат обработки в виде обычного текста, без HTML
           content:
             application/json:
               schema:
-                type: object
-                required: [mode, result]
-                properties:
-                  mode:
-                    $ref: '#/components/schemas/ProcessingMode'
-                  result:
-                    type: string
+                $ref: '#/components/schemas/ProcessTextResponse'
+              example:
+                mode: SHORT_SUMMARY
+                result: Митохондрии обеспечивают клетку энергией.
         '400':
-          description: Неверный режим, отсутствующее поле или пустой файл
+          description: Пустой текст, отсутствующее поле, неверный JSON или неподдерживаемый режим
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                emptyText:
+                  value:
+                    type: about:blank
+                    title: Bad Request
+                    status: 400
+                    detail: Текст не должен быть пустым.
+                    instance: /api/v1/text/process
+                invalidMode:
+                  value:
+                    type: about:blank
+                    title: Bad Request
+                    status: 400
+                    detail: В текущей версии поддерживается только SHORT_SUMMARY.
+                    instance: /api/v1/text/process
         '413':
-          description: Превышен лимит 10 MB на файл или 30 MB на запрос
-        '501':
-          description: Обработка пока не реализована (Problem Details)
+          description: Текст превышает 10000 Unicode-символов
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                type: about:blank
+                title: Payload Too Large
+                status: 413
+                detail: Максимальная длина текста — 10000 символов.
+                instance: /api/v1/text/process
+        '502':
+          description: Ошибка, таймаут или исчерпание квоты внешнего LLM; без внутренних данных провайдера
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                type: about:blank
+                title: Bad Gateway
+                status: 502
+                detail: Сервис обработки текста временно недоступен. Повторите запрос позже.
+                instance: /api/v1/text/process
 components:
   schemas:
     ProcessingMode:
       type: string
       enum: [SHORT_SUMMARY, DETAILED_SUMMARY, SIMPLE_EXPLANATION, SELF_CHECK_QUESTIONS, KEY_TERMS]
+    ProcessTextRequest:
+      type: object
+      additionalProperties: false
+      required: [text, mode]
+      properties:
+        text:
+          type: string
+          minLength: 1
+          maxLength: 10000
+          pattern: '\S'
+        mode:
+          $ref: '#/components/schemas/ProcessingMode'
+    ProcessTextResponse:
+      type: object
+      additionalProperties: false
+      required: [mode, result]
+      properties:
+        mode:
+          $ref: '#/components/schemas/ProcessingMode'
+        result:
+          type: string
+          minLength: 1
+    Problem:
+      type: object
+      required: [type, title, status, detail, instance]
+      properties:
+        type:
+          type: string
+          example: about:blank
+        title:
+          type: string
+        status:
+          type: integer
+          minimum: 400
+          maximum: 599
+        detail:
+          type: string
+        instance:
+          type: string

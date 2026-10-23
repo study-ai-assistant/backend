@@ -1,12 +1,24 @@
 name: CI
 on:
   push:
-    branches: [main, base]
+    branches: [main, 'feature/**', 'chore/**', 'docs/**']
   pull_request:
 permissions:
   contents: read
 jobs:
-  build:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - run: ./mvnw --batch-mode checkstyle:check
+  tests:
+    name: tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -16,3 +28,22 @@ jobs:
           java-version: '21'
           cache: maven
       - run: ./mvnw --batch-mode verify
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-reports
+          path: target/surefire-reports/
+  docker:
+    name: docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build and start without LLM secrets
+        run: |
+          cp .env.example .env
+          docker compose up --build --wait --wait-timeout 180
+          curl --fail --retry 5 --retry-delay 2 http://localhost:8080/health
+          docker compose exec -T backend sh -c 'test ! -e /app/.env'
+      - name: Stop containers
+        if: always()
+        run: docker compose down

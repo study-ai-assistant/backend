@@ -45,6 +45,7 @@ Copy-Item .env.example .env
 
 ```properties
 APP_PORT=8080
+LLM_PROVIDER=
 LLM_API_KEY=
 LLM_BASE_URL=
 LLM_MODEL=
@@ -53,6 +54,7 @@ LLM_MODEL=
 | Переменная | Назначение | Значение по умолчанию |
 |---|---|---|
 | `APP_PORT` | HTTP-порт сервера | `8080` |
+| `LLM_PROVIDER` | Название провайдера, например `groq` | Пусто |
 | `LLM_API_KEY` | Ключ будущего LLM-клиента | Пусто |
 | `LLM_BASE_URL` | Адрес будущего LLM API | Пусто |
 | `LLM_MODEL` | Название будущей модели | Пусто |
@@ -163,6 +165,42 @@ HTTP, разрешите его в debug-конфигурации мобильн
 | Телефон не видит сервер | Проверьте IP компьютера, общую сеть, порт и межсетевой экран; сначала проверьте `/health` на компьютере. |
 | Загрузка файла возвращает `501` | Это ожидаемо: парсеры и вызов LLM пока не реализованы. |
 
+## Запуск через Docker Compose
+
+Для mobile-разработчиков достаточно Docker с Compose plugin; JDK и Maven
+на хосте не нужны. Установка: https://docs.docker.com/get-started/get-docker/.
+Проверьте `docker version` и `docker compose version`, затем из корня проекта:
+
+```bash
+cp .env.example .env
+# Windows PowerShell: Copy-Item .env.example .env
+docker compose up --build
+```
+
+Не перезаписывайте существующий .env. В другом терминале:
+`curl -i http://localhost:8080/health` (PowerShell: curl.exe).
+Ожидается 200 и `{"status":"ok"}`. Для запуска в фоне используйте
+`docker compose up --build -d --wait --wait-timeout 180`.
+Остановить: `docker compose down`; посмотреть состояние: `docker compose ps`.
+При изменении .env: `docker compose up -d --force-recreate`.
+Порт хоста берётся из APP_PORT, по умолчанию 8080. В контейнере — всегда 8080.
+.env и Git-история не входят в Docker-контекст; ключ передаётся окружением
+при запуске, а не при сборке. Не публикуйте вывод `docker compose config` с ключами.
+
+Подробная установка Windows/macOS/Linux и разбор проблем:
+[локальная инструкция для wiki](docs/wiki/Запуск-и-окружение.md).
+
+## Проверки качества
+
+```bash
+./mvnw checkstyle:check
+./mvnw verify
+```
+
+Windows: `.\mvnw.cmd` вместо `./mvnw`. verify включает линтер, тесты
+и сборку JAR. CI настроен на PR и push в main/feature/chore/docs;
+обязательные проверки main добавляет руководитель после успешного CI.
+
 ## API
 
 - `GET /health` — тестовый эндпоинт для мобильного клиента: `{"status":"ok"}`.
@@ -183,6 +221,13 @@ curl -F 'files=@lecture.txt' -F 'mode=SHORT_SUMMARY' http://localhost:8080/api/v
 Ограничения: 10 MB на файл, 30 MB на запрос; превышение — `413`.
 Ошибки API имеют формат Problem Details. Контракт: `docs/api/openapi.yaml`.
 
+Черновик **JSON API обработки текста**: `POST /api/v1/text/process`,
+поля `text` и `mode`. Он описан в OpenAPI для согласования с mobile (#4),
+но не реализован: это задача #8, исключённая из текущей работы.
+Текущий ответ на этот маршрут — 404. Экспериментальная multipart-заглушка
+оставлена для совместимости и не входит в контракт спринта 1.
+Примеры ответа 200 и ошибок 400/413/502 — в [контракте](docs/api/README.md).
+
 ## Структура папок
 
 ```text
@@ -191,6 +236,11 @@ backend/
 ├── .mvn/ и mvnw*            # Maven Wrapper
 ├── .run/                    # конфигурация запуска IntelliJ IDEA
 ├── docs/api/                # контракт OpenAPI
+├── docs/wiki/               # локальные материалы для wiki
+├── config/checkstyle/       # правила линтера Java
+├── docker/                  # проверка состояния контейнера
+├── Dockerfile               # многоэтапная сборка
+├── docker-compose.yml       # запуск сервера одной командой
 ├── src/main/java/ru/studyassistant/backend/
 │   ├── BackendApplication.java
 │   ├── health/              # GET /health
@@ -231,6 +281,15 @@ backend/
 | Предложение по стеку | [docs/STACK_PROPOSAL.md](docs/STACK_PROPOSAL.md) |
 
 
+## Состояние задач спринта
+
+Выполненное локально и пункты, требующие команды, review, Docker и публикации,
+перечислены в [отчёте](docs/SPRINT_BACKEND_STATUS.md). GitHub wiki подготовлена
+в docs/wiki, но не публиковалась. Задача #8 не выполнялась.
+
 ## Участники
+
+- Данияр Кабиров (@52KgUselessKid) — backend.
+
 
 Список команды — в [wiki](https://github.com/study-ai-assistant/backend/wiki).

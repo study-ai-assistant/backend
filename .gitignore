@@ -26,3 +26,19 @@ logs/
 # Временные файлы
 tmp/
 *.tmp
+
+# Java: скомпилированные классы и отчёты о сбоях JVM
+*.class
+hs_err_pid*
+replay_pid*
+
+# Maven: результаты сборки
+target/
+
+# Дополнительные файлы Eclipse / Spring Tool Suite
+.classpath
+.project
+.settings/
+
+# Результаты сборки IntelliJ IDEA
+out/

@@ -282,16 +282,6 @@ backend/
 | Definition of Done | [docs/DEFINITION_OF_DONE.md](docs/DEFINITION_OF_DONE.md) |
 | Предложение по стеку | [docs/STACK_PROPOSAL.md](docs/STACK_PROPOSAL.md) |
 
-
-## Состояние задач спринта
-
-Выполненное локально и пункты, требующие команды, review, Docker и публикации,
-перечислены в [отчёте](docs/SPRINT_BACKEND_STATUS.md). GitHub wiki подготовлена
-в docs/wiki, но не публиковалась. Задача #8 не выполнялась.
-
 ## Участники
-
-- Данияр Кабиров (@52KgUselessKid) — backend.
-
 
 Список команды — в [wiki](https://github.com/study-ai-assistant/backend/wiki).

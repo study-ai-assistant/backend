@@ -3,7 +3,7 @@ info:
   title: ИИ-помощник для учёбы — API
   version: 0.1.0
   description: |
-    Черновик для согласования с mobile (задача #4).
+    Реализованный API текста; изменения контракта согласовываются с mobile (задача #4).
     GET /health и GET /api/v1/modes реализованы.
     POST /api/v1/text/process реализован в задаче #8 для режима SHORT_SUMMARY.
     Загрузка файлов относится к следующему спринту и в этот контракт не входит.
@@ -50,6 +50,9 @@ paths:
       description: |
         Синхронный запрос, UTF-8. Поддерживается SHORT_SUMMARY;
         остальные режимы возвращают 400.
+        Запрос содержит ровно два поля text и mode; дополнительные поля не принимаются.
+        Переносы строк внутри text кодируются как \n; JSON формируется сериализатором.
+        Для генерации серверу нужны настройки Groq и действующий ключ.
         text содержит от 1 до 10000 Unicode-символов и хотя бы один непробельный символ.
         Лимит применяется к декодированному text, не к размеру JSON в байтах.
         Отдельная предварительная проверка токенного бюджета пока не реализована.
@@ -109,6 +112,8 @@ paths:
                 status: 413
                 detail: Максимальная длина текста — 10000 символов.
                 instance: /api/v1/text/process
+        '415':
+          description: Content-Type должен быть application/json; ошибка обрабатывается Spring
         '502':
           description: Ошибка, таймаут или исчерпание квоты внешнего LLM; без внутренних данных провайдера
           content:
@@ -121,6 +126,46 @@ paths:
                 status: 502
                 detail: Сервис обработки текста временно недоступен. Повторите запрос позже.
                 instance: /api/v1/text/process
+  /actuator/health:
+    get:
+      operationId: actuatorHealth
+      summary: Техническая проверка Spring Boot
+      responses:
+        '200':
+          description: Сервер работает
+  /api/v1/materials/process:
+    post:
+      operationId: uploadMaterialsStub
+      summary: Заглушка загрузки файлов; обработка документов не реализована
+      x-implementation-status: stub
+      description: |
+        Этот маршрут технически принимает multipart-загрузку, но непустые файлы
+        всегда дают 501. TXT, PDF, DOCX не разбираются и не передаются в LLM.
+        Ограничения загрузки 10 MB на файл и 30 MB на запрос.
+        Для рабочей обработки используйте JSON с готовым текстом на /api/v1/text/process.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [files, mode]
+              properties:
+                files:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+                    format: binary
+                mode:
+                  $ref: '#/components/schemas/ProcessingMode'
+      responses:
+        '400':
+          description: Пустой файл, отсутствующее поле или неверный идентификатор режима
+        '413':
+          description: Превышен лимит multipart-загрузки
+        '501':
+          description: Обработка файлов ещё не реализована
 components:
   schemas:
     ProcessingMode:

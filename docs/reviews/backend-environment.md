@@ -1,4 +1,9 @@
-# Локальные замечания к ветке chore/5-backend-environment
+# Исторические замечания к ветке chore/5-backend-environment
+
+Снимок обсуждения до реализации №8. Сейчас feature/server-base содержит
+GroqLlmClient и POST /api/v1/text/process. Текущие версии определяются pom.xml
+и Maven Wrapper, состояние API — README и docs/api/openapi.yaml.
+Удалённая wiki и ветка окружения повторно не проверялись при этом обновлении.
 
 Это подготовка к обсуждению #3/#5, а не опубликованный review или approve.
 

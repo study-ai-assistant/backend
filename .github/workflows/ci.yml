@@ -1,56 +1,49 @@
-# ЗАГОТОВКА CI.
-# Сейчас проверяет только наличие обязательных файлов.
-# Линтер и тесты закомментированы: включить после выбора стека (см. docs/STACK_PROPOSAL.md в backend).
-
 name: CI
-
 on:
   push:
-    branches: [main]
+    branches: [main, 'feature/**', 'chore/**', 'docs/**']
   pull_request:
-
 permissions:
   contents: read
-
 jobs:
-  required-files:
-    name: Обязательные файлы
+  lint:
+    name: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-
-      - name: Проверить наличие обязательных файлов
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - run: ./mvnw --batch-mode checkstyle:check
+  tests:
+    name: tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - run: ./mvnw --batch-mode verify
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-reports
+          path: target/surefire-reports/
+  docker:
+    name: docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build and start without LLM secrets
         run: |
-          missing=0
-          for f in README.md CONTRIBUTING.md; do
-            if [ -f "$f" ]; then
-              echo "OK: $f"
-            else
-              echo "::error::Не найден обязательный файл: $f"
-              missing=1
-            fi
-          done
-          exit $missing
-
-  # ВКЛЮЧИТЬ ПОСЛЕ ВЫБОРА СТЕКА: линтер.
-  # Раскомментировать и заменить шаги установки и запуска на команды выбранного стека.
-  # lint:
-  #   name: Линтер
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v5
-  #     # - name: Установить окружение
-  #     #   uses: <action для выбранного стека>
-  #     # - name: Запустить линтер
-  #     #   run: <команда линтера>
-
-  # ВКЛЮЧИТЬ ПОСЛЕ ВЫБОРА СТЕКА: тесты.
-  # tests:
-  #   name: Тесты
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v5
-  #     # - name: Установить окружение
-  #     #   uses: <action для выбранного стека>
-  #     # - name: Запустить тесты
-  #     #   run: <команда тестов>
+          cp .env.example .env
+          docker compose up --build --wait --wait-timeout 180
+          curl --fail --retry 5 --retry-delay 2 http://localhost:8080/health
+          docker compose exec -T backend sh -c 'test ! -e /app/.env'
+      - name: Stop containers
+        if: always()
+        run: docker compose down

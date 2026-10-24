@@ -1,0 +1,17 @@
+# Allowlist: local documents, credentials and Git history never enter build context.
+**
+!Dockerfile
+!.mvn/
+!.mvn/**
+!mvnw
+!pom.xml
+!config/
+!config/**
+!src/
+!src/**
+!docker/
+!docker/HealthCheck.java
+**/.env
+**/.env.*
+**/*.pem
+**/*.key

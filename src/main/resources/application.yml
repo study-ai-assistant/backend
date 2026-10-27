@@ -1,0 +1,32 @@
+spring:
+  config:
+    import: "optional:file:./.env[.properties]"
+  application:
+    name: backend
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 30MB
+  mvc:
+    problemdetails:
+      enabled: true
+server:
+  port: ${APP_PORT:8080}
+  error:
+    include-message: never
+    include-stacktrace: never
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+# Для обработки текста нужны настройки Groq; /health работает без ключа.
+app:
+  llm:
+    provider: ${LLM_PROVIDER:}
+    api-key: ${LLM_API_KEY:}
+    base-url: ${LLM_BASE_URL:}
+    model: ${LLM_MODEL:}

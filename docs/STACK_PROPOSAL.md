@@ -128,7 +128,7 @@
 
 | Часть | Решает | Решение                        |
 |---|---|--------------------------------|
-| Mobile | команда **mobile** | ЗАПОЛНИТЬ                      |
+| Mobile | команда **mobile** | Kotlin + Jetpack Compose; Android Studio; сборка Gradle (Kotlin DSL); минимальная версия Android — API 26 |
 | Backend | команда **backend** | Java 21 + Spring Boot 4.1.1 + Maven; Groq через Spring RestClient (#8); Spring AI не подключён |
 
 Решение записывается в эту таблицу через Pull Request до конца Спринта 1.

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import ru.studyassistant.backend.llm.LlmClient;
 
-/** Принимает учебный текст в JSON и возвращает краткий конспект. */
+/** Принимает учебный текст в JSON и возвращает результат выбранного режима. */
 @RestController
 public class TextProcessingController {
 
@@ -60,16 +60,25 @@ public class TextProcessingController {
             );
         }
 
-        // Остальные режимы пока не реализованы.
-        if (!ProcessingMode.SHORT_SUMMARY.name().equals(request.get("mode"))) {
+        if (!(request.get("mode") instanceof String modeName)) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "В текущей версии поддерживается только SHORT_SUMMARY."
+                    "Поле mode должно быть строкой."
             );
         }
 
-        // Обращаемся к LLM после успешной проверки
-        String result = llmClient.generate(text, ProcessingMode.SHORT_SUMMARY);
-        return new ProcessingResult(ProcessingMode.SHORT_SUMMARY, result);
+        // Преобразуем название режима в enum. Неизвестный режим возвращает 400.
+        ProcessingMode mode;
+        try {
+            mode = ProcessingMode.valueOf(modeName);
+        } catch (IllegalArgumentException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Неподдерживаемый режим обработки."
+            );
+        }
+
+        String result = llmClient.generate(text, mode);
+        return new ProcessingResult(mode, result);
     }
 }

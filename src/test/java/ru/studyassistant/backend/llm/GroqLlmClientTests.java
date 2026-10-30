@@ -16,6 +16,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import ru.studyassistant.backend.material.ProcessingMode;
 import tools.jackson.databind.json.JsonMapper;
@@ -48,9 +49,10 @@ class GroqLlmClientTests {
         server.stop(0);
     }
 
-    /** Проверяет содержимое запроса и получение конспекта. */
-    @Test
-    void returnsSummary() throws Exception {
+    /** Проверяет отправку промпта выбранного режима и получение результата. */
+    @ParameterizedTest
+    @EnumSource(ProcessingMode.class)
+    void sendsPromptForEachMode(ProcessingMode mode) throws Exception {
         respondWith(200, """
                 {
                   "id": "test",
@@ -58,14 +60,14 @@ class GroqLlmClientTests {
                     "index": 0,
                     "message": {
                       "role": "assistant",
-                      "content": "  Конспект  "
+                      "content": "  Результат обработки  "
                     }
                   }]
                 }
                 """);
 
-        assertThat(client.generate("Текст", ProcessingMode.SHORT_SUMMARY))
-                .isEqualTo("Конспект");
+        assertThat(client.generate("Текст", mode))
+                .isEqualTo("Результат обработки");
 
         ReceivedRequest request = received.get();
         assertThat(request.method()).isEqualTo("POST");
@@ -74,9 +76,14 @@ class GroqLlmClientTests {
 
         var json = mapper.readTree(request.body());
         assertThat(json.path("model").asText()).isEqualTo("test-model");
-        assertThat(json.path("messages").get(0).path("role").asText()).isEqualTo("system");
-        assertThat(json.path("messages").get(1).path("role").asText()).isEqualTo("user");
-        assertThat(json.path("messages").get(1).path("content").asText()).isEqualTo("Текст");
+
+        var messages = json.path("messages");
+        assertThat(messages.size()).isEqualTo(2);
+        assertThat(messages.get(0).path("role").asText()).isEqualTo("system");
+        assertThat(messages.get(0).path("content").asText())
+                .isEqualTo(LlmPrompts.forMode(mode));
+        assertThat(messages.get(1).path("role").asText()).isEqualTo("user");
+        assertThat(messages.get(1).path("content").asText()).isEqualTo("Текст");
     }
 
     /** Ошибки провайдера не должны раскрывать его внутренний ответ. */
@@ -87,7 +94,7 @@ class GroqLlmClientTests {
         assertUnavailable();
     }
 
-    /** Даже ответ 200 считается ошибкой, если в нём нет конспекта. */
+    /** Даже ответ 200 считается ошибкой, если в нём нет результата. */
     @ParameterizedTest
     @ValueSource(strings = {
             "{\"choices\":[]}",

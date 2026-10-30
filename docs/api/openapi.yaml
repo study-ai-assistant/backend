@@ -5,7 +5,9 @@ info:
   description: |
     Черновик для согласования с mobile (задача #4).
     GET /health и GET /api/v1/modes реализованы.
-    POST /api/v1/text/process реализован в задаче #8 для режима SHORT_SUMMARY.
+    POST /api/v1/text/process реализован в задаче #8;
+    поддержка всех пяти режимов добавлена в задаче #18.
+    Примеры результатов иллюстративные; формулировки LLM могут отличаться.
     Загрузка файлов относится к следующему спринту и в этот контракт не входит.
 servers:
   - url: http://localhost:8080
@@ -32,7 +34,7 @@ paths:
   /api/v1/modes:
     get:
       operationId: listModes
-      summary: Все идентификаторы режимов; не означает готовность их обработки
+      summary: Все поддерживаемые режимы обработки текста
       responses:
         '200':
           description: Пять режимов
@@ -48,8 +50,11 @@ paths:
       operationId: processText
       summary: Обработать учебный текст
       description: |
-        Синхронный запрос, UTF-8. Поддерживается SHORT_SUMMARY;
-        остальные режимы возвращают 400.
+        Синхронный запрос, UTF-8. Поддерживаются все пять режимов:
+        SHORT_SUMMARY, DETAILED_SUMMARY, SIMPLE_EXPLANATION,
+        SELF_CHECK_QUESTIONS, KEY_TERMS.
+        Результат возвращается на русском языке обычным текстом
+        в поле result, без HTML, Markdown и служебной разметки модели.
         text содержит от 1 до 10000 Unicode-символов и хотя бы один непробельный символ.
         Лимит применяется к декодированному text, не к размеру JSON в байтах.
         Отдельная предварительная проверка токенного бюджета пока не реализована.
@@ -68,14 +73,45 @@ paths:
               mode: SHORT_SUMMARY
       responses:
         '200':
-          description: Результат обработки в виде обычного текста, без HTML
+          description: Результат обработки на русском языке обычным текстом, без HTML и служебной разметки модели
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProcessTextResponse'
-              example:
-                mode: SHORT_SUMMARY
-                result: Митохондрии обеспечивают клетку энергией.
+              examples:
+                shortSummary:
+                  summary: Краткий конспект
+                  value:
+                    mode: SHORT_SUMMARY
+                    result: Митохондрии обеспечивают клетку энергией.
+                detailedSummary:
+                  summary: Подробный конспект
+                  value:
+                    mode: DETAILED_SUMMARY
+                    result: |
+                      Митохондрии обеспечивают клетку энергией.
+                      Это происходит в процессе клеточного дыхания.
+                simpleExplanation:
+                  summary: Объяснение простыми словами
+                  value:
+                    mode: SIMPLE_EXPLANATION
+                    result: |
+                      Митохондрии помогают клетке получать энергию в процессе клеточного дыхания.
+                      По аналогии их можно представить как небольшие электростанции внутри клетки.
+                selfCheckQuestions:
+                  summary: Вопросы для самопроверки
+                  value:
+                    mode: SELF_CHECK_QUESTIONS
+                    result: |
+                      Что обеспечивает клетку энергией?
+                      В процессе чего митохондрии обеспечивают клетку энергией?
+                keyTerms:
+                  summary: Ключевые термины
+                  value:
+                    mode: KEY_TERMS
+                    result: |
+                      Митохондрии — структуры, обеспечивающие клетку энергией.
+                      Клеточное дыхание — процесс, в ходе которого митохондрии обеспечивают клетку энергией.
         '400':
           description: Пустой текст, отсутствующее или лишнее поле, неверный тип данных, неверный JSON или неподдерживаемый режим
           content:
@@ -95,7 +131,7 @@ paths:
                     type: about:blank
                     title: Bad Request
                     status: 400
-                    detail: В текущей версии поддерживается только SHORT_SUMMARY.
+                    detail: Неподдерживаемый режим обработки.
                     instance: /api/v1/text/process
         '413':
           description: Текст превышает 10000 Unicode-символов

@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,24 +33,29 @@ class TextProcessingTests {
             {"text":"Учебный текст","mode":"SHORT_SUMMARY"}
             """;
 
-    // Spring запускает сервер на свободном порту и передаёт его сюда
+    // Spring запускает сервер на свободном порту и передаёт его сюда.
     @Value("${local.server.port}")
     private int port;
 
-    // Подменяем настоящий клиент объектом с заданными в тестах ответами
+    // Подменяем настоящий клиент объектом с заданными в тестах ответами.
     @MockitoBean
     private LlmClient llmClient;
 
     private final HttpClient client = HttpClient.newHttpClient();
     private final JsonMapper mapper = JsonMapper.builder().build();
 
-    /** Корректный запрос должен вернуть результат LLM и статус 200. */
-    @Test
-    void returnsSummary() throws Exception {
-        when(llmClient.generate("Учебный текст", ProcessingMode.SHORT_SUMMARY))
-                .thenReturn("Краткий конспект");
+    /** Каждый из пяти режимов должен возвращать результат LLM и статус 200. */
+    @ParameterizedTest
+    @EnumSource(ProcessingMode.class)
+    void processesAllModes(ProcessingMode mode) throws Exception {
+        when(llmClient.generate("Учебный текст", mode))
+                .thenReturn("Результат обработки");
 
-        var response = post(VALID_REQUEST);
+        String body = """
+                {"text":"Учебный текст","mode":"%s"}
+                """.formatted(mode.name());
+
+        var response = post(body);
 
         assertThat(response.statusCode()).isEqualTo(200);
         assertThat(response.headers().firstValue("Content-Type").orElse(""))
@@ -57,11 +63,11 @@ class TextProcessingTests {
 
         var json = mapper.readTree(response.body());
         assertThat(json.size()).isEqualTo(2);
-        assertThat(json.path("mode").asText()).isEqualTo("SHORT_SUMMARY");
-        assertThat(json.path("result").asText()).isEqualTo("Краткий конспект");
+        assertThat(json.path("mode").asText()).isEqualTo(mode.name());
+        assertThat(json.path("result").asText()).isEqualTo("Результат обработки");
 
         // Проверяем, что контроллер передал клиенту нужный текст и режим.
-        verify(llmClient).generate("Учебный текст", ProcessingMode.SHORT_SUMMARY);
+        verify(llmClient).generate("Учебный текст", mode);
     }
 
     /** Неверные запросы должны отклоняться до обращения к LLM. */
@@ -78,9 +84,13 @@ class TextProcessingTests {
                 // Пустой текст.
                 Arguments.of("{\"text\":\"   \",\"mode\":\"SHORT_SUMMARY\"}", 400),
 
-                // Известный, но пока неподдерживаемый режим; неизвестный режим.
-                Arguments.of("{\"text\":\"Текст\",\"mode\":\"DETAILED_SUMMARY\"}", 400),
+                // Неизвестный режим.
                 Arguments.of("{\"text\":\"Текст\",\"mode\":\"UNKNOWN\"}", 400),
+
+                // Неверный тип или регистр режима.
+                Arguments.of("{\"text\":\"Текст\",\"mode\":123}", 400),
+                Arguments.of("{\"text\":\"Текст\",\"mode\":null}", 400),
+                Arguments.of("{\"text\":\"Текст\",\"mode\":\"short_summary\"}", 400),
 
                 // Отсутствуют обязательные поля.
                 Arguments.of("{\"mode\":\"SHORT_SUMMARY\"}", 400),

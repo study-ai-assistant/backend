@@ -23,7 +23,7 @@ management:
   endpoint:
     health:
       show-details: never
-# Зарезервировано для будущего LlmClient; ключ не нужен для запуска скелета.
+# Для обработки текста нужны настройки Groq; /health работает без ключа.
 app:
   llm:
     provider: ${LLM_PROVIDER:}

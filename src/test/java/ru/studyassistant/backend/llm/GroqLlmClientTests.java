@@ -80,7 +80,15 @@ class GroqLlmClientTests {
         var messages = json.path("messages");
         assertThat(messages.size()).isEqualTo(2);
         assertThat(messages.get(0).path("role").asText()).isEqualTo("system");
+        String expectedInstruction = switch (mode) {
+            case SHORT_SUMMARY -> "Сделай краткий конспект";
+            case DETAILED_SUMMARY -> "Сделай подробный конспект";
+            case SIMPLE_EXPLANATION -> "простыми словами для новичка";
+            case SELF_CHECK_QUESTIONS -> "Составь вопросы для самопроверки";
+            case KEY_TERMS -> "Выдели ключевые термины";
+        };
         assertThat(messages.get(0).path("content").asText())
+                .contains(expectedInstruction, "Отвечай на русском языке")
                 .isEqualTo(LlmPrompts.forMode(mode));
         assertThat(messages.get(1).path("role").asText()).isEqualTo("user");
         assertThat(messages.get(1).path("content").asText()).isEqualTo("Текст");

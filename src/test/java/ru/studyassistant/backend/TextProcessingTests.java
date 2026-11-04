@@ -25,7 +25,8 @@ import ru.studyassistant.backend.material.ProcessingMode;
 import tools.jackson.databind.json.JsonMapper;
 
 /** Проверяет API обработки текста без настоящих запросов к LLM. */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = "spring.config.import=")
 class TextProcessingTests {
 
     private static final String ENDPOINT = "/api/v1/text/process";

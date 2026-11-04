@@ -5,9 +5,13 @@ on:
   pull_request:
 permissions:
   contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   lint:
     name: lint
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -19,6 +23,7 @@ jobs:
       - run: ./mvnw --batch-mode checkstyle:check
   tests:
     name: tests
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -29,12 +34,14 @@ jobs:
           cache: maven
       - run: ./mvnw --batch-mode verify
       - uses: actions/upload-artifact@v4
-        if: failure()
+        if: always()
         with:
           name: test-reports
           path: target/surefire-reports/
+          if-no-files-found: ignore
   docker:
     name: docker
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -43,6 +50,7 @@ jobs:
           cp .env.example .env
           docker compose up --build --wait --wait-timeout 180
           curl --fail --retry 5 --retry-delay 2 http://localhost:8080/health
+          curl --fail http://localhost:8080/api/v1/modes
           docker compose exec -T backend sh -c 'test ! -e /app/.env'
       - name: Stop containers
         if: always()

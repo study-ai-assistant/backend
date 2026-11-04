@@ -1,7 +1,9 @@
 package ru.studyassistant.backend.material;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -45,12 +47,12 @@ public class MaterialService {
 
         // 3. Извлечение текста из файла
         String text;
-        try {
-            text = textExtractor.extract(file.getInputStream(), filename);
+        try (InputStream input = file.getInputStream()) {
+            text = textExtractor.extract(input, filename);
         } catch (IOException e) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "Не удалось прочитать содержимое файла: " + e.getMessage()
+                    "Не удалось прочитать файл. Поддерживаются UTF-8 и Windows-1251."
             );
         }
 
@@ -76,7 +78,7 @@ public class MaterialService {
     }
 
     private boolean hasAllowedExtension(String filename) {
-        String lowerFilename = filename.toLowerCase();
+        String lowerFilename = filename.toLowerCase(Locale.ROOT);
         return ALLOWED_EXTENSIONS.stream().anyMatch(lowerFilename::endsWith);
     }
 }

@@ -14,6 +14,7 @@ class OpenApiContractTests {
         var result = new OpenAPIV3Parser().readLocation("docs/api/openapi.yaml", null, options);
         assertThat(result.getMessages()).isEmpty();
         assertThat(result.getOpenAPI()).isNotNull();
-        assertThat(result.getOpenAPI().getPaths()).containsKeys("/health", "/api/v1/text/process");
+        assertThat(result.getOpenAPI().getPaths()).containsKeys("/health", "/api/v1/modes",
+                "/api/v1/text/process", "/api/v1/materials/process");
     }
 }

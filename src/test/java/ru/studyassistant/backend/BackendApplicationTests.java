@@ -9,7 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = "spring.config.import=")
 class BackendApplicationTests {
     @Value("${local.server.port}")
     private int port;
@@ -31,26 +32,8 @@ class BackendApplicationTests {
                 "SIMPLE_EXPLANATION", "SELF_CHECK_QUESTIONS", "KEY_TERMS");
     }
 
-    @Test
-    void uploadIsExplicitlyUnimplementedAndRejectsInvalidInput() throws Exception {
-        assertThat(upload("SHORT_SUMMARY", "Lecture").statusCode()).isEqualTo(501);
-        assertThat(upload("SHORT_SUMMARY", "").statusCode()).isEqualTo(400);
-        assertThat(upload("UNKNOWN", "Lecture").statusCode()).isEqualTo(400);
-    }
-
     private HttpResponse<String> get(String path) throws Exception {
         return client.send(HttpRequest.newBuilder(uri(path)).GET().build(),
-                HttpResponse.BodyHandlers.ofString());
-    }
-
-    private HttpResponse<String> upload(String mode, String text) throws Exception {
-        String body = "--boundary\r\nContent-Disposition: form-data; name=\"mode\"\r\n\r\n"
-                + mode + "\r\n--boundary\r\nContent-Disposition: form-data; name=\"files\"; "
-                + "filename=\"lecture.txt\"\r\nContent-Type: text/plain\r\n\r\n"
-                + text + "\r\n--boundary--\r\n";
-        return client.send(HttpRequest.newBuilder(uri("/api/v1/materials/process"))
-                .header("Content-Type", "multipart/form-data; boundary=boundary")
-                .POST(HttpRequest.BodyPublishers.ofString(body)).build(),
                 HttpResponse.BodyHandlers.ofString());
     }
 

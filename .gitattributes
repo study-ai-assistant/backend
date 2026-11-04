@@ -1,4 +1,5 @@
 * text=auto
 mvnw text eol=lf
-mvnw.cmd text eol=crlf
+# Wrapper уже хранится с CRLF; сохраняем байты без повторной нормализации.
+mvnw.cmd -text
 *.sh text eol=lf

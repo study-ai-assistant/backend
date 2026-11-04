@@ -1,40 +1,28 @@
-# API
+# API backend
 
-Текстовая обработка №8 включена в feature/server-base: работает Groq и SHORT_SUMMARY.
-Схема — docs/api/openapi.yaml; подробная инструкция и примеры — docs/api/README.md.
-Это локальная редакция wiki; публикация не выполнялась в рамках обновления документации.
+Актуальная инструкция с curl и правилами mobile:
+[docs/api/README.md](https://github.com/study-ai-assistant/backend/blob/main/docs/api/README.md).
+Формальная схема: [openapi.yaml](https://github.com/study-ai-assistant/backend/blob/main/docs/api/openapi.yaml).
 
-| Метод | Путь | Назначение | Статус |
-|---|---|---|---|
-| GET | /health | 200, {"status":"ok"} | Работает без ключа |
-| GET | /actuator/health | Техническое состояние | Работает |
-| GET | /api/v1/modes | Все пять идентификаторов | Работает; обработка только SHORT_SUMMARY |
-| POST | /api/v1/text/process | JSON text + mode → mode + result | Работает через Groq |
-| POST | /api/v1/materials/process | multipart files + mode | Заглушка 501, файлы не обрабатываются |
+| Запрос | Действие |
+|---|---|
+| GET /health | Проверка связи без ключа LLM |
+| GET /actuator/health | Техническая проверка |
+| GET /api/v1/modes | Пять режимов без ключа |
+| POST /api/v1/text/process | JSON с text и mode |
+| POST /api/v1/materials/process | multipart с одним file и mode |
 
-Content-Type для текста: application/json. Пример запроса:
+Все пять режимов доступны для JSON и TXT. TXT поддерживает UTF-8 (с BOM и без)
+и Windows-1251; лимит файла 10 МиБ, запроса 30 МиБ, текста 10000 Unicode-кодовых точек.
+Пустые данные / неверный режим — 400, превышение лимита — 413,
+другое расширение — 415, ошибка или таймаут LLM — 502.
+PDF/DOCX/OCR не реализованы. Файлы не сохраняются в постоянном хранилище.
 
-```json
-{"text":"Митохондрии обеспечивают клетку энергией.","mode":"SHORT_SUMMARY"}
+```bash
+curl -i --max-time 90 http://localhost:8080/api/v1/materials/process \
+  -F 'file=@lecture.txt;type=text/plain' \
+  -F 'mode=DETAILED_SUMMARY'
 ```
 
-Пример успешного ответа:
-
-```json
-{"mode":"SHORT_SUMMARY","result":"Митохондрии снабжают клетку энергией."}
-```
-
-Ровно два поля. text — строка с непробельным содержимым до 10000 Unicode-кодовых точек.
-Другие режимы, лишние поля, неверный JSON и пустой текст → 400; большой текст → 413.
-Ошибка/таймаут/квота Groq или неполные настройки → 502 в application/problem+json.
-Неверный Content-Type → 415 (обработчик Spring).
-Переносы в строке кодировать как \n; в мобильном клиенте использовать сериализатор.
-
-Рекомендованный таймаут клиента 90 секунд; сервер ожидает LLM не более 60 секунд.
-Повтор POST может повторить расход квоты. Токенный бюджет и очередь не реализованы.
-TXT/DOCX/PDF не разбираются; JSON с text не является загрузкой документа.
-Для обработки нужен свой ключ на сервере, а не на телефоне.
-
-Адрес компьютера: http://localhost:8080; Android-эмулятора: http://10.0.2.2:8080;
-телефона в общей сети: http://<IP-компьютера>:8080. Сначала проверить GET /health.
-При изменении API согласовать контракт с mobile и обновить OpenAPI и примеры.
+Не задавайте общий Content-Type вручную: multipart boundary формирует клиент.
+Результат: JSON с mode и result. Ключ провайдера мобильному приложению не передаётся.

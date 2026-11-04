@@ -6,7 +6,8 @@ COPY mvnw pom.xml ./
 COPY config/ config/
 COPY src/ src/
 COPY docker/HealthCheck.java docker/HealthCheck.java
-RUN chmod +x mvnw && ./mvnw --batch-mode -DskipTests package \
+RUN --mount=type=cache,target=/root/.m2 \
+    chmod +x mvnw && ./mvnw --batch-mode -DskipTests package \
     && javac -d /workspace/healthcheck docker/HealthCheck.java
 
 FROM eclipse-temurin:21-jre-jammy

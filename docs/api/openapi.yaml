@@ -1,16 +1,17 @@
 openapi: 3.0.3
 info:
   title: ИИ-помощник для учёбы — API
-  version: 0.1.0
+  version: 0.1.0  
   description: |
     Реализованный API текста; изменения контракта согласовываются с mobile (задача #4).
     GET /health и GET /api/v1/modes реализованы.
     POST /api/v1/text/process реализован в задаче #8;
     поддержка всех пяти режимов добавлена в задаче #18.
     Примеры результатов иллюстративные; формулировки LLM могут отличаться.
-    TXT-файлы обрабатываются по контракту задачи №21. PDF и DOCX пока не поддерживаются.
-servers:
-  - url: http://localhost:8080
+    TXT-файлы обрабатываются по контракту задачи №21.
+    PDF поддерживается с задачи #30; DOCX пока не поддерживаются.  
+  servers:
+    - url: http://localhost:8080
     description: Локальный сервер
 paths:
   /health:
@@ -45,142 +46,31 @@ paths:
                 items:
                   $ref: '#/components/schemas/ProcessingMode'
               example: [SHORT_SUMMARY, DETAILED_SUMMARY, SIMPLE_EXPLANATION, SELF_CHECK_QUESTIONS, KEY_TERMS]
-  /api/v1/text/process:
-    post:
-      operationId: processText
-      summary: Обработать учебный текст
-      description: |
-        Синхронный запрос, UTF-8. Поддерживаются все пять режимов из ProcessingMode.
-        Неизвестный идентификатор режима возвращает 400.
-        Запрос содержит ровно два поля text и mode; дополнительные поля не принимаются.
-        Переносы строк внутри text кодируются как \n; JSON формируется сериализатором.
-        Для генерации серверу нужны настройки Groq и действующий ключ.
-        text содержит от 1 до 10000 Unicode-символов и хотя бы один непробельный символ.
-        Лимит применяется к декодированному text, не к размеру JSON в байтах.
-        Отдельная предварительная проверка токенного бюджета пока не реализована.
-        Ошибки провайдера, включая превышение его лимитов, возвращаются как 502.
-        Клиенту рекомендуется таймаут 90 секунд; ожидание результата LLM ограничено 60 секундами.
-        Автоматический повтор POST не гарантирует отсутствие повторной обработки.
-      x-implementation-status: implemented
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProcessTextRequest'
-            example:
-              text: Митохондрии обеспечивают клетку энергией в процессе клеточного дыхания.
-              mode: SHORT_SUMMARY
-      responses:
-        '200':
-          description: Результат обработки на русском языке обычным текстом, без HTML и служебной разметки модели
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProcessTextResponse'
-              examples:
-                shortSummary:
-                  summary: Краткий конспект
-                  value:
-                    mode: SHORT_SUMMARY
-                    result: Митохондрии обеспечивают клетку энергией.
-                detailedSummary:
-                  summary: Подробный конспект
-                  value:
-                    mode: DETAILED_SUMMARY
-                    result: |
-                      Митохондрии обеспечивают клетку энергией.
-                      Это происходит в процессе клеточного дыхания.
-                simpleExplanation:
-                  summary: Объяснение простыми словами
-                  value:
-                    mode: SIMPLE_EXPLANATION
-                    result: |
-                      Митохондрии помогают клетке получать энергию в процессе клеточного дыхания.
-                      По аналогии их можно представить как небольшие электростанции внутри клетки.
-                selfCheckQuestions:
-                  summary: Вопросы для самопроверки
-                  value:
-                    mode: SELF_CHECK_QUESTIONS
-                    result: |
-                      Что обеспечивает клетку энергией?
-                      В процессе чего митохондрии обеспечивают клетку энергией?
-                keyTerms:
-                  summary: Ключевые термины
-                  value:
-                    mode: KEY_TERMS
-                    result: |
-                      Митохондрии — структуры, обеспечивающие клетку энергией.
-                      Клеточное дыхание — процесс, в ходе которого митохондрии обеспечивают клетку энергией.
-        '400':
-          description: Пустой текст, отсутствующее или лишнее поле, неверный тип данных, неверный JSON или неподдерживаемый режим
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              examples:
-                emptyText:
-                  value:
-                    type: about:blank
-                    title: Bad Request
-                    status: 400
-                    detail: Текст не должен быть пустым.
-                    instance: /api/v1/text/process
-                invalidMode:
-                  value:
-                    type: about:blank
-                    title: Bad Request
-                    status: 400
-                    detail: Неподдерживаемый режим обработки.
-                    instance: /api/v1/text/process
-        '413':
-          description: Текст превышает 10000 Unicode-символов
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              example:
-                type: about:blank
-                title: Payload Too Large
-                status: 413
-                detail: Максимальная длина текста — 10000 символов.
-                instance: /api/v1/text/process
-        '415':
-          description: Content-Type должен быть application/json; ошибка обрабатывается Spring
-        '502':
-          description: Ошибка, таймаут или исчерпание квоты внешнего LLM; без внутренних данных провайдера
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-              example:
-                type: about:blank
-                title: Bad Gateway
-                status: 502
-                detail: Сервис обработки текста временно недоступен. Повторите запрос позже.
-                instance: /api/v1/text/process
-  /actuator/health:
-    get:
-      operationId: actuatorHealth
-      summary: Техническая проверка Spring Boot
-      responses:
-        '200':
-          description: Сервер работает
   /api/v1/materials/process:
     post:
-      operationId: uploadTxtMaterial
-      summary: Загрузка и обработка одного TXT-файла
+      operationId: uploadMaterial
+      summary: Загрузка и обработка файла (TXT или PDF)
       description: |
-        Принимает один файл с расширением .txt (без учёта регистра) в поле file
+        Принимает один файл с расширением .txt или .pdf (без учёта регистра) в поле file
         и выбранный режим в поле mode. Поддерживаются все пять режимов.
-        UTF-8 декодируется строго; при ошибке используется Windows-1251.
-        Начальный UTF-8 BOM удаляется. Файл должен содержать непустой текст.
+        
+        Для TXT: UTF-8 декодируется строго; при ошибке используется Windows-1251.
+        Начальный UTF-8 BOM удаляется.
+        
+        Для PDF: извлекается текстовый слой через Apache PDFBox 3.0.8.
+        PDF без текстового слоя (сканы), зашифрованные или повреждённые файлы отклоняются.
+        Текст извлекается с сортировкой по позиции; для сложных макетов (колонки, таблицы)
+        порядок может отличаться от визуального.
+        
         Размер файла до 10 МиБ (10485760 байт), всего multipart-запроса до 30 МиБ.
-        Извлечённый текст ограничен 10000 Unicode-кодовыми точками, как и JSON.
-        Расширение проверяется сервером; Content-Type части рекомендуется text/plain.
-        PDF, DOCX и другие расширения дают 415. Поле files не поддерживается.
+        Максимум 50 страниц для PDF.
+        Извлечённый текст ограничен 10000 Unicode-кодовыми точками.
+        
+        Расширение проверяется сервером; Content-Type части рекомендуется text/plain для TXT
+        или application/pdf для PDF.
+        Неподдерживаемые расширения дают 415. Поле files не поддерживается.
         Формат результата и ошибки LLM совпадают с обработкой JSON-текста.
-      x-implementation-status: implemented
+      x-implementation-status: in-progress
       requestBody:
         required: true
         content:
@@ -192,12 +82,12 @@ paths:
                 file:
                   type: string
                   format: binary
-                  description: TXT-файл для обработки
+                  description: TXT или PDF файл для обработки. Максимум 10 МБ, для PDF — до 50 страниц.
                 mode:
                   $ref: '#/components/schemas/ProcessingMode'
             encoding:
               file:
-                contentType: text/plain
+                contentType: text/plain, application/pdf
       responses:
         '200':
           description: Файл успешно обработан
@@ -205,45 +95,117 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProcessTextResponse'
-              example:
-                mode: SHORT_SUMMARY
-                result: Краткое содержание загруженного TXT-файла.
+              examples:
+                txtExample:
+                  summary: TXT файл
+                  value:
+                    mode: SHORT_SUMMARY
+                    result: Краткое содержание загруженного TXT-файла.
+                pdfExample:
+                  summary: PDF файл
+                  value:
+                    mode: SHORT_SUMMARY
+                    result: Краткое содержание извлечённого текста из PDF.
         '400':
           description: Пустой файл, отсутствующее поле или неверный режим
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-              example:
-                type: about:blank
-                title: Bad Request
-                status: 400
-                detail: Файл пуст или не содержит текста.
-                instance: /api/v1/materials/process
+              examples:
+                emptyFile:
+                  summary: Пустой файл
+                  value:
+                    type: about:blank
+                    title: Bad Request
+                    status: 400
+                    detail: Файл пуст или не содержит текста.
+                    instance: /api/v1/materials/process
+                invalidMode:
+                  summary: Неверный режим
+                  value:
+                    type: about:blank
+                    title: Bad Request
+                    status: 400
+                    detail: Неподдерживаемый режим обработки.
+                    instance: /api/v1/materials/process
         '413':
-          description: Превышен размер файла 10 МиБ, запроса 30 МиБ или длина текста 10000 символов
+          description: Превышен размер файла 10 МиБ, запроса 30 МиБ, длина текста 10000 символов или количество страниц PDF > 50
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-              example:
-                type: about:blank
-                title: Payload Too Large
-                status: 413
-                detail: Размер файла превышает максимальный лимит в 10 МБ.
-                instance: /api/v1/materials/process
+              examples:
+                fileSizeLimit:
+                  summary: Превышен размер файла
+                  value:
+                    type: about:blank
+                    title: Payload Too Large
+                    status: 413
+                    detail: Размер файла превышает максимальный лимит в 10 МБ.
+                    instance: /api/v1/materials/process
+                textLengthLimit:
+                  summary: Превышена длина текста
+                  value:
+                    type: about:blank
+                    title: Payload Too Large
+                    status: 413
+                    detail: Максимальная длина текста — 10000 символов.
+                    instance: /api/v1/materials/process
+                pageLimit:
+                  summary: Превышено количество страниц PDF
+                  value:
+                    type: about:blank
+                    title: Payload Too Large
+                    status: 413
+                    detail: PDF содержит слишком много страниц. Максимум: 50 страниц.
+                    instance: /api/v1/materials/process
         '415':
-          description: Неподдерживаемое расширение файла (ожидается .txt)
+          description: Неподдерживаемое расширение файла (ожидаются .txt или .pdf)
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-              example:
-                type: about:blank
-                title: Unsupported Media Type
-                status: 415
-                detail: Принят неподдерживаемый формат файла. Ожидался TXT.
-                instance: /api/v1/materials/process
+              examples:
+                unsupportedFormat:
+                  summary: Неподдерживаемый формат
+                  value:
+                    type: about:blank
+                    title: Unsupported Media Type
+                    status: 415
+                    detail: Принят неподдерживаемый формат файла. Ожидаются TXT или PDF.
+                    instance: /api/v1/materials/process
+        '422':
+          description: Ошибка обработки PDF: нет текстового слоя, защищён паролем или повреждён
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                noTextLayer:
+                  summary: PDF без текстового слоя (скан)
+                  value:
+                    type: about:blank
+                    title: Unprocessable Entity
+                    status: 422
+                    detail: PDF-файл не содержит текстового слоя (возможно, это скан). Загрузите PDF с распознаваемым текстом или TXT-файл.
+                    instance: /api/v1/materials/process
+                passwordProtected:
+                  summary: PDF защищён паролем
+                  value:
+                    type: about:blank
+                    title: Unprocessable Entity
+                    status: 422
+                    detail: PDF-файл защищён паролем. Снимите защиту и загрузите файл снова.
+                    instance: /api/v1/materials/process
+                corruptedFile:
+                  summary: Повреждённый PDF
+                  value:
+                    type: about:blank
+                    title: Unprocessable Entity
+                    status: 422
+                    detail: PDF-файл повреждён и не может быть прочитан. Проверьте файл и загрузите снова.
+                    instance: /api/v1/materials/process
         '502':
           description: Ошибка внешнего LLM или сервиса обработки
           content:
@@ -256,7 +218,18 @@ paths:
                 status: 502
                 detail: Сервис обработки текста временно недоступен. Повторите запрос позже.
                 instance: /api/v1/materials/process
-
+        '504':
+          description: Превышен таймаут обработки PDF (10 секунд)
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                type: about:blank
+                title: Gateway Timeout
+                status: 504
+                detail: Превышено время обработки файла. Попробуйте файл меньшего размера или сложности.
+                instance: /api/v1/materials/process
 components:
   schemas:
     ProcessingMode:

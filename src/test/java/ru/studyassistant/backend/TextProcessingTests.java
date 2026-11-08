@@ -11,9 +11,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.studyassistant.backend.llm.LlmClient;
 import ru.studyassistant.backend.llm.LlmUnavailableException;
+import ru.studyassistant.backend.llm.LlmUnavailableException.Reason;
 import ru.studyassistant.backend.material.ProcessingMode;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -114,18 +115,21 @@ class TextProcessingTests {
     }
 
     /** При ошибке LLM возвращается 502, а сервер продолжает работать. */
-    @Test
-    void handlesLlmFailure() throws Exception {
+    @ParameterizedTest
+    @CsvSource({
+            "RATE_LIMIT, Лимит сервиса обработки текста исчерпан. Повторите запрос позже.",
+            "TIMEOUT, Сервис обработки текста не ответил вовремя. Повторите запрос.",
+            "UNAVAILABLE, Сервис обработки текста временно недоступен. Повторите запрос позже."
+    })
+    void handlesLlmFailure(Reason reason, String detail) throws Exception {
         when(llmClient.generate("Учебный текст", ProcessingMode.SHORT_SUMMARY))
-                .thenThrow(new LlmUnavailableException());
+                .thenThrow(new LlmUnavailableException(reason));
 
         var response = post(VALID_REQUEST);
         assertProblem(response, 502);
 
         var json = mapper.readTree(response.body());
-        assertThat(json.path("detail").asText()).isEqualTo(
-                "Сервис обработки текста временно недоступен. Повторите запрос позже."
-        );
+        assertThat(json.path("detail").asText()).isEqualTo(detail);
 
         var health = get("/health");
         assertThat(health.statusCode()).isEqualTo(200);

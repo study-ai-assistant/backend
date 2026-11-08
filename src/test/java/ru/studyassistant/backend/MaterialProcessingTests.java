@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -24,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.studyassistant.backend.llm.LlmClient;
 import ru.studyassistant.backend.llm.LlmUnavailableException;
+import ru.studyassistant.backend.llm.LlmUnavailableException.Reason;
 import ru.studyassistant.backend.material.ProcessingMode;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -103,13 +105,19 @@ class MaterialProcessingTests {
         verifyNoInteractions(llmClient);
     }
 
-    @Test
-    void returns502WhenProviderFails() throws Exception {
-        when(llmClient.generate(TEXT, ProcessingMode.SHORT_SUMMARY)).thenThrow(new LlmUnavailableException());
+    @ParameterizedTest
+    @CsvSource({
+            "RATE_LIMIT, Лимит сервиса обработки текста исчерпан. Повторите запрос позже.",
+            "TIMEOUT, Сервис обработки текста не ответил вовремя. Повторите запрос.",
+            "UNAVAILABLE, Сервис обработки текста временно недоступен. Повторите запрос позже."
+    })
+    void returns502WhenProviderFails(Reason reason, String detail) throws Exception {
+        when(llmClient.generate(TEXT, ProcessingMode.SHORT_SUMMARY))
+                .thenThrow(new LlmUnavailableException(reason));
+
         var response = upload("test.txt", TEXT.getBytes(StandardCharsets.UTF_8), "SHORT_SUMMARY", "file");
         assertProblem(response, 502);
-        assertThat(mapper.readTree(response.body()).path("detail").asText()).isEqualTo(
-                "Сервис обработки текста временно недоступен. Повторите запрос позже.");
+        assertThat(mapper.readTree(response.body()).path("detail").asText()).isEqualTo(detail);
     }
 
     @Test
@@ -147,8 +155,8 @@ class MaterialProcessingTests {
         body.write(("\r\n--boundary\r\nContent-Disposition: form-data; name=\"mode\"\r\n\r\n"
                 + mode + "\r\n--boundary--\r\n").getBytes(StandardCharsets.UTF_8));
         return client.send(HttpRequest.newBuilder(URI.create("http://localhost:" + port + PATH))
-                .header("Content-Type", "multipart/form-data; boundary=boundary")
-                .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray())).build(),
+                        .header("Content-Type", "multipart/form-data; boundary=boundary")
+                        .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray())).build(),
                 HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
     }
 }

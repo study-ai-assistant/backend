@@ -46,31 +46,18 @@ paths:
                 items:
                   $ref: '#/components/schemas/ProcessingMode'
               example: [SHORT_SUMMARY, DETAILED_SUMMARY, SIMPLE_EXPLANATION, SELF_CHECK_QUESTIONS, KEY_TERMS]
-  /api/v1/materials/process:
+    /api/v1/materials/process:
     post:
       operationId: uploadMaterial
-      summary: Загрузка и обработка файла (TXT или PDF)
+      summary: Загрузка и обработка учебного материала (TXT или PDF)
       description: |
         Принимает один файл с расширением .txt или .pdf (без учёта регистра) в поле file
         и выбранный режим в поле mode. Поддерживаются все пять режимов.
-        
         Для TXT: UTF-8 декодируется строго; при ошибке используется Windows-1251.
-        Начальный UTF-8 BOM удаляется.
-        
-        Для PDF: извлекается текстовый слой через Apache PDFBox 3.0.8.
-        PDF без текстового слоя (сканы), зашифрованные или повреждённые файлы отклоняются.
-        Текст извлекается с сортировкой по позиции; для сложных макетов (колонки, таблицы)
-        порядок может отличаться от визуального.
-        
-        Размер файла до 10 МиБ (10485760 байт), всего multipart-запроса до 30 МиБ.
-        Максимум 50 страниц для PDF.
-        Извлечённый текст ограничен 10000 Unicode-кодовыми точками.
-        
-        Расширение проверяется сервером; Content-Type части рекомендуется text/plain для TXT
-        или application/pdf для PDF.
-        Неподдерживаемые расширения дают 415. Поле files не поддерживается.
-        Формат результата и ошибки LLM совпадают с обработкой JSON-текста.
-      x-implementation-status: in-progress
+        Для PDF: извлекается текстовый слой с сохранением порядка страниц.
+        Размер файла до 10 МиБ, всего multipart-запроса до 30 МиБ.
+        Расширение проверяется сервером. DOCX и другие форматы дают 415.
+      x-implementation-status: implemented
       requestBody:
         required: true
         content:
@@ -82,7 +69,7 @@ paths:
                 file:
                   type: string
                   format: binary
-                  description: TXT или PDF файл для обработки. Максимум 10 МБ, для PDF — до 50 страниц.
+                  description: TXT или PDF файл для обработки
                 mode:
                   $ref: '#/components/schemas/ProcessingMode'
             encoding:

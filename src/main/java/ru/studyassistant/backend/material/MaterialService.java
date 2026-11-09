@@ -17,14 +17,18 @@ public class MaterialService {
     private static final long MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 МБ
     private static final int MAX_TEXT_LENGTH = 10000;
     private static final Pattern NON_WHITESPACE = Pattern.compile("\\S");
-    private static final List<String> ALLOWED_EXTENSIONS = List.of(".txt");
+    
+    // ДОБАВИЛИ .pdf в список разрешенных
+    private static final List<String> ALLOWED_EXTENSIONS = List.of(".txt", ".pdf");
 
     private final TextExtractor textExtractor;
     private final LlmClient llmClient;
+    private final PdfTextExtractor pdfTextExtractor; // ДОБАВИЛИ
 
-    public MaterialService(TextExtractor textExtractor, LlmClient llmClient) {
+    public MaterialService(TextExtractor textExtractor, LlmClient llmClient, PdfTextExtractor pdfTextExtractor) {
         this.textExtractor = textExtractor;
         this.llmClient = llmClient;
+        this.pdfTextExtractor = pdfTextExtractor; // ДОБАВИЛИ
     }
 
     public ProcessingResult process(MultipartFile file, ProcessingMode mode) {
@@ -33,7 +37,7 @@ public class MaterialService {
         if (filename == null || !hasAllowedExtension(filename)) {
             throw new ResponseStatusException(
                     HttpStatus.UNSUPPORTED_MEDIA_TYPE,
-                    "Принят неподдерживаемый формат файла. Ожидался TXT."
+                    "Принят неподдерживаемый формат файла. Ожидался TXT или PDF." // ИЗМЕНИЛИ
             );
         }
 
@@ -47,12 +51,20 @@ public class MaterialService {
 
         // 3. Извлечение текста из файла
         String text;
-        try (InputStream input = file.getInputStream()) {
-            text = textExtractor.extract(input, filename);
+        try {
+            if (filename.toLowerCase(Locale.ROOT).endsWith(".pdf")) {
+                // НОВАЯ ЛОГИКА ДЛЯ PDF
+                text = pdfTextExtractor.extractText(file);
+            } else {
+                // СТАРАЯ ЛОГИКА ДЛЯ TXT
+                try (InputStream input = file.getInputStream()) {
+                    text = textExtractor.extract(input, filename);
+                }
+            }
         } catch (IOException e) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "Не удалось прочитать файл. Поддерживаются UTF-8 и Windows-1251."
+                    "Не удалось прочитать файл."
             );
         }
 

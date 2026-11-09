@@ -1,6 +1,7 @@
 package ru.studyassistant.backend.llm;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -8,17 +9,24 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import ru.studyassistant.backend.llm.LlmUnavailableException.Reason;
 import ru.studyassistant.backend.material.ProcessingMode;
 
 /** HTTP-клиент Groq для обработки учебного текста в выбранном режиме. */
 @Component
 public class GroqLlmClient implements LlmClient {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GroqLlmClient.class);
 
     private final LlmProperties properties;
     private final RestClient client;
@@ -47,13 +55,16 @@ public class GroqLlmClient implements LlmClient {
             return task.get(60, TimeUnit.SECONDS);
         } catch (TimeoutException exception) {
             task.cancel(true);
-            throw new LlmUnavailableException();
+            throw failure(Reason.TIMEOUT, "deadline_exceeded");
         } catch (InterruptedException exception) {
             task.cancel(true);
             Thread.currentThread().interrupt();
-            throw new LlmUnavailableException();
+            throw failure(Reason.UNAVAILABLE, "interrupted");
         } catch (ExecutionException exception) {
-            throw new LlmUnavailableException();
+            if (exception.getCause() instanceof LlmUnavailableException llmFailure) {
+                throw llmFailure;
+            }
+            throw failure(Reason.UNAVAILABLE, "unexpected_client_error");
         }
     }
 
@@ -63,7 +74,7 @@ public class GroqLlmClient implements LlmClient {
                 || properties.getApiKey().isBlank()
                 || properties.getModel().isBlank()
                 || properties.getBaseUrl().isBlank()) {
-            throw new LlmUnavailableException();
+            throw failure(Reason.UNAVAILABLE, "missing_configuration");
         }
 
         // Инструкция режима и учебный текст передаются отдельно.
@@ -75,10 +86,7 @@ public class GroqLlmClient implements LlmClient {
                 Map.of("role", "user", "content", text)
         );
 
-        var request = Map.of(
-                "model", properties.getModel(),
-                "messages", messages
-        );
+        var request = new GroqRequest(properties.getModel(), messages);
 
         String url = properties.getBaseUrl().replaceAll("/+$", "")
                 + "/chat/completions";
@@ -92,12 +100,21 @@ public class GroqLlmClient implements LlmClient {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
                     .retrieve()
+                    .onStatus(HttpStatusCode::isError, (ignored, upstream) -> {
+                        int status = upstream.getStatusCode().value();
+                        Reason reason = switch (status) {
+                            case 429 -> Reason.RATE_LIMIT;
+                            case 408, 504 -> Reason.TIMEOUT;
+                            default -> Reason.UNAVAILABLE;
+                        };
+                        throw failure(reason, "http_status=" + status);
+                    })
                     .body(GroqResponse.class);
 
             if (response == null
                     || response.choices() == null
                     || response.choices().isEmpty()) {
-                throw new LlmUnavailableException();
+                throw failure(Reason.UNAVAILABLE, "empty_choices");
             }
 
             Choice choice = response.choices().getFirst();
@@ -107,12 +124,30 @@ public class GroqLlmClient implements LlmClient {
                     || choice.message() == null
                     || choice.message().content() == null
                     || choice.message().content().isBlank()) {
-                throw new LlmUnavailableException();
+                throw failure(Reason.UNAVAILABLE, "empty_content");
             }
 
             return choice.message().content().strip();
         } catch (RestClientException exception) {
-            throw new LlmUnavailableException();
+            if (exception.contains(SocketTimeoutException.class)) {
+                throw failure(Reason.TIMEOUT, "socket_timeout");
+            }
+            String diagnostic = exception instanceof ResourceAccessException
+                    ? "network_error" : "invalid_response";
+            throw failure(Reason.UNAVAILABLE, diagnostic);
+        }
+    }
+
+    private LlmUnavailableException failure(Reason reason, String diagnostic) {
+        LOG.warn("Groq request failed: reason={}, diagnostic={}", reason, diagnostic);
+        return new LlmUnavailableException(reason);
+    }
+
+    private record GroqRequest(String model, List<Map<String, String>> messages) {
+        @Override
+        public String toString() {
+            // RestClient вызывает toString() при отладочном логировании запроса.
+            return "GroqRequest";
         }
     }
 

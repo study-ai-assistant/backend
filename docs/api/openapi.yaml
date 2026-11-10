@@ -350,12 +350,28 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-              example:
-                type: about:blank
-                title: Bad Gateway
-                status: 502
-                detail: Сервис обработки текста временно недоступен. Повторите запрос позже.
-                instance: /api/v1/materials/process
+              examples:
+                rateLimit:
+                  value:
+                    type: about:blank
+                    title: Bad Gateway
+                    status: 502
+                    detail: Лимит сервиса обработки текста исчерпан. Повторите запрос позже.
+                    instance: /api/v1/materials/process
+                timeout:
+                  value:
+                    type: about:blank
+                    title: Bad Gateway
+                    status: 502
+                    detail: Сервис обработки текста не ответил вовремя. Повторите запрос.
+                    instance: /api/v1/materials/process
+                unavailable:
+                  value:
+                    type: about:blank
+                    title: Bad Gateway
+                    status: 502
+                    detail: Сервис обработки текста временно недоступен. Повторите запрос позже.
+                    instance: /api/v1/materials/process
         '504':
           description: Превышен таймаут обработки PDF (10 секунд)
           content:

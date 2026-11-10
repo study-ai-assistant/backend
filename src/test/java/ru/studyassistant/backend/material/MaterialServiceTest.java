@@ -21,7 +21,7 @@ class MaterialServiceTest {
 
     private final TextExtractor textExtractor = mock(TextExtractor.class);
     private final LlmClient llmClient = mock(LlmClient.class);
-    private final MaterialService service = new MaterialService(textExtractor, llmClient);
+    private final MaterialService service = new MaterialService(textExtractor, llmClient, mock(PdfTextExtractor.class));
 
     @Test
     void shouldProcessValidUtf8File() throws Exception {
@@ -83,7 +83,7 @@ class MaterialServiceTest {
     @Test
     void shouldRejectNonTxtFile() {
         MockMultipartFile file = new MockMultipartFile(
-                "file", "document.pdf", "application/pdf", "fake pdf content".getBytes()
+                "file", "document.docx", "application/octet-stream", "fake pdf content".getBytes()
         );
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {

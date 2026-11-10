@@ -21,8 +21,22 @@ import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.AfterAll;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import java.nio.file.Path;
+import java.nio.file.Files;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import ru.studyassistant.backend.llm.LlmUnavailableException;
+import ru.studyassistant.backend.material.PdfProperties;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,7 +48,37 @@ import tools.jackson.databind.json.JsonMapper;
 /** PDF читается настоящим PDFBox, внешний LLM заменён заглушкой. */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = "spring.config.import=")
+@ExtendWith(OutputCaptureExtension.class)
 class PdfProcessingTests {
+    private static final Path TEMP_ROOT = createTempRoot();
+
+    private static Path createTempRoot() {
+        try {
+            return Files.createTempDirectory("pdf-http-test-");
+        } catch (java.io.IOException exception) {
+            throw new ExceptionInInitializerError(exception);
+        }
+    }
+
+    @DynamicPropertySource
+    static void pdfSettings(DynamicPropertyRegistry registry) {
+        registry.add("app.pdf.temp-directory", () -> TEMP_ROOT.toString());
+    }
+
+    @AfterEach
+    void noTemporaryResourcesRemain() throws Exception {
+        try (var files = Files.list(TEMP_ROOT)) {
+            assertThat(files.toList()).isEmpty();
+        }
+    }
+
+    @AfterAll
+    static void removeTestDirectory() throws Exception {
+        Files.delete(TEMP_ROOT);
+    }
+
+    @Autowired
+    private PdfProperties pdfProperties;
     @Value("${local.server.port}")
     private int port;
     @MockitoBean
@@ -98,6 +142,72 @@ class PdfProcessingTests {
         when(llmClient.generate(anyString(), eq(ProcessingMode.SHORT_SUMMARY))).thenReturn("Ответ");
         assertThat(upload("pages.pdf", generated(50, "Text", false), ProcessingMode.SHORT_SUMMARY)
                 .statusCode()).isEqualTo(200);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"plain.pdf,Photosynthesis", "table.pdf,Earth", "formulas.pdf,E = mc²"})
+    void processesDatasetDocuments(String filename, String marker) throws Exception {
+        when(llmClient.generate(anyString(), eq(ProcessingMode.SHORT_SUMMARY))).thenReturn("Ответ");
+        assertThat(upload(filename, resource(filename), ProcessingMode.SHORT_SUMMARY).statusCode()).isEqualTo(200);
+        var text = ArgumentCaptor.forClass(String.class);
+        verify(llmClient).generate(text.capture(), eq(ProcessingMode.SHORT_SUMMARY));
+        assertThat(text.getValue()).contains(marker);
+        if (filename.equals("table.pdf")) {
+            assertThat(text.getValue()).containsSubsequence("Planet", "Moons", "Earth", "1", "Mars", "2");
+        }
+        if (filename.equals("formulas.pdf")) {
+            assertThat(text.getValue()).contains("a² + b² = c²", "α + β = γ");
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"scan.pdf", "password.pdf", "corrupted.pdf"})
+    void rejectsDatasetDocumentsBeforeLlm(String filename, CapturedOutput output) throws Exception {
+        assertProblem(upload(filename, resource(filename), ProcessingMode.SHORT_SUMMARY), 422);
+        verifyNoInteractions(llmClient);
+        assertThat(output.getAll()).doesNotContain("Intentionally corrupted synthetic fixture", "fixture-password");
+    }
+
+    @Test
+    void pdfLlmFailureIs502() throws Exception {
+        when(llmClient.generate(anyString(), eq(ProcessingMode.SHORT_SUMMARY)))
+                .thenThrow(new LlmUnavailableException());
+        assertProblem(upload("russian.pdf", resource("russian.pdf"), ProcessingMode.SHORT_SUMMARY), 502);
+    }
+
+    @Test
+    void configuredPageLimitIsUsed() throws Exception {
+        int original = pdfProperties.getMaxPages();
+        try {
+            pdfProperties.setMaxPages(1);
+            assertProblem(upload("pages.pdf", resource("multipage.pdf"), ProcessingMode.SHORT_SUMMARY), 413);
+            verifyNoInteractions(llmClient);
+        } finally {
+            pdfProperties.setMaxPages(original);
+        }
+    }
+
+    @Test
+    void configuredTimeoutReturns504AndServerKeepsWorking() throws Exception {
+        var original = pdfProperties.getTimeout();
+        try {
+            pdfProperties.setTimeout(java.time.Duration.ofMillis(1));
+            assertProblem(upload("russian.pdf", resource("russian.pdf"), ProcessingMode.SHORT_SUMMARY), 504);
+            verifyNoInteractions(llmClient);
+        } finally {
+            pdfProperties.setTimeout(original);
+        }
+        when(llmClient.generate(anyString(), eq(ProcessingMode.SHORT_SUMMARY))).thenReturn("Ответ");
+        assertThat(upload("russian.pdf", resource("russian.pdf"), ProcessingMode.SHORT_SUMMARY)
+                .statusCode()).isEqualTo(200);
+    }
+
+    @Test
+    void doesNotLogFileContents(CapturedOutput output) throws Exception {
+        when(llmClient.generate(anyString(), eq(ProcessingMode.SHORT_SUMMARY))).thenReturn("Ответ");
+        assertThat(upload("russian.pdf", resource("russian.pdf"), ProcessingMode.SHORT_SUMMARY)
+                .statusCode()).isEqualTo(200);
+        assertThat(output.getAll()).doesNotContain("Ёж изучает биологию", "Митохондрии обеспечивают");
     }
 
     private byte[] generated(int pages, String text, boolean encrypted) throws Exception {

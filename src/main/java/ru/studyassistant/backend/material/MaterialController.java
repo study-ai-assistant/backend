@@ -25,7 +25,8 @@ public class MaterialController {
             @RequestParam("mode") ProcessingMode mode) {
 
         if (files.size() != 1) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Передайте ровно один файл (TXT или PDF)."); // ИЗМЕНИЛИ
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Передайте ровно один файл (TXT или PDF).");
         }
         MultipartFile file = files.getFirst();
         if (file.isEmpty()) {

@@ -25,6 +25,12 @@ management:
       show-details: never
 # Для обработки текста нужны настройки Groq; /health работает без ключа.
 app:
+  pdf:
+    max-pages: ${PDF_MAX_PAGES:50}
+    timeout: ${PDF_TIMEOUT:10s}
+    max-concurrent: ${PDF_MAX_CONCURRENT:2}
+    worker-heap-mb: ${PDF_WORKER_HEAP_MB:128}
+    temp-directory: ${PDF_TEMP_DIRECTORY:${java.io.tmpdir}}
   llm:
     provider: ${LLM_PROVIDER:}
     api-key: ${LLM_API_KEY:}

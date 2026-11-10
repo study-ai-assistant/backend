@@ -201,7 +201,7 @@ paths:
         порядок может отличаться от визуального.
 
         Размер файла до 10 МиБ (10485760 байт), всего multipart-запроса до 30 МиБ.
-        Максимум 50 страниц для PDF.
+        По умолчанию максимум 50 страниц PDF (PDF_MAX_PAGES); таймаут разбора 10 секунд (PDF_TIMEOUT).
         Извлечённый текст ограничен 10000 Unicode-кодовыми точками.
 
         Расширение и содержимое должны соответствовать друг другу; Content-Type части рекомендуется text/plain для TXT
@@ -372,8 +372,20 @@ paths:
                     status: 502
                     detail: Сервис обработки текста временно недоступен. Повторите запрос позже.
                     instance: /api/v1/materials/process
+        '503':
+          description: Все процессы разбора PDF заняты или worker не удалось запустить
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                type: about:blank
+                title: Service Unavailable
+                status: 503
+                detail: Сервис разбора PDF занят. Повторите запрос позже.
+                instance: /api/v1/materials/process
         '504':
-          description: Превышен таймаут обработки PDF (10 секунд)
+          description: Превышен настраиваемый таймаут обработки PDF (по умолчанию 10 секунд)
           content:
             application/problem+json:
               schema:

@@ -1,7 +1,7 @@
 name: CI
 on:
   push:
-    branches: [main, 'feature/**', 'chore/**', 'docs/**']
+    branches: [main, 'feature/**', 'chore/**', 'docs/**', '32-34-pdf']
   pull_request:
 permissions:
   contents: read
@@ -52,6 +52,11 @@ jobs:
           curl --fail --retry 5 --retry-delay 2 http://localhost:8080/health
           curl --fail http://localhost:8080/api/v1/modes
           docker compose exec -T backend sh -c 'test ! -e /app/.env'
+          status=$(curl --silent --show-error --max-time 20 -o /tmp/pdf-problem.json -w '%{http_code}' \
+            -F 'file=@src/test/resources/pdf/scan.pdf;type=application/pdf' \
+            -F 'mode=SHORT_SUMMARY' http://localhost:8080/api/v1/materials/process)
+          test "$status" = "422"
+          python3 -c 'import json; assert json.load(open("/tmp/pdf-problem.json"))["status"] == 422'
       - name: Stop containers
         if: always()
         run: docker compose down

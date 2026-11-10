@@ -9,6 +9,10 @@ services:
       LLM_MODEL: "${LLM_MODEL:-}"
       LLM_API_KEY: "${LLM_API_KEY:-}"
       LLM_BASE_URL: "${LLM_BASE_URL:-}"
+      PDF_MAX_PAGES: "${PDF_MAX_PAGES:-50}"
+      PDF_TIMEOUT: "${PDF_TIMEOUT:-10s}"
+      PDF_MAX_CONCURRENT: "${PDF_MAX_CONCURRENT:-2}"
+      PDF_WORKER_HEAP_MB: "${PDF_WORKER_HEAP_MB:-128}"
     healthcheck:
       test: ["CMD", "java", "-cp", "/app", "HealthCheck"]
       interval: 10s

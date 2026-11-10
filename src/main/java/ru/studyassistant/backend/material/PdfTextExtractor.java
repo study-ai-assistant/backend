@@ -1,99 +1,112 @@
 package ru.studyassistant.backend.material;
 
+import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.Writer;
-import java.time.Duration;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
-import org.apache.pdfbox.text.PDFTextStripper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
-/** Извлекает только текстовый слой PDF, без OCR. */
+/** Ограничивает память и время PDFBox и освобождает процесс и файлы при любом исходе. */
 @Component
 public class PdfTextExtractor {
-    private final Duration timeout;
+    private static final Logger LOG = LoggerFactory.getLogger(PdfTextExtractor.class);
+    private final PdfProperties properties;
+    private final PdfWorkerLauncher launcher;
+    private final Semaphore slots;
 
-    public PdfTextExtractor() {
-        this(Duration.ofSeconds(10));
-    }
-
-    PdfTextExtractor(Duration timeout) {
-        this.timeout = timeout;
+    public PdfTextExtractor(PdfProperties properties, PdfWorkerLauncher launcher) {
+        this.properties = properties;
+        this.launcher = launcher;
+        this.slots = new Semaphore(properties.getMaxConcurrent());
     }
 
     public String extract(byte[] bytes) {
-        var task = new FutureTask<String>(() -> readPdf(bytes));
-        Thread.startVirtualThread(task);
+        if (!slots.tryAcquire()) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
+                    "Сервис разбора PDF занят. Повторите запрос позже.");
+        }
+        Path directory = null;
+        Process process = null;
         try {
-            return task.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
-        } catch (TimeoutException exception) {
-            task.cancel(true);
-            throw new ResponseStatusException(HttpStatus.GATEWAY_TIMEOUT,
-                    "Превышено время обработки файла. Попробуйте файл меньшего размера или сложности.");
+            directory = Files.createTempDirectory(properties.getTempDirectory(), "study-pdf-");
+            Files.write(directory.resolve("input.pdf"), bytes);
+            process = launcher.start(directory, properties);
+            process.getOutputStream().close();
+            if (!process.waitFor(properties.getTimeout().toMillis(), TimeUnit.MILLISECONDS)) {
+                throw new ResponseStatusException(HttpStatus.GATEWAY_TIMEOUT,
+                        "Превышено время обработки файла. Попробуйте файл меньшего размера или сложности.");
+            }
+            if (process.exitValue() != 0 || !Files.isRegularFile(directory.resolve("result.bin"))) {
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                        "PDF-файл повреждён или слишком сложен для обработки.");
+            }
+            return readResult(directory.resolve("result.bin"));
         } catch (InterruptedException exception) {
-            task.cancel(true);
             Thread.currentThread().interrupt();
             throw new ResponseStatusException(HttpStatus.GATEWAY_TIMEOUT, "Обработка файла прервана.");
-        } catch (ExecutionException exception) {
-            if (exception.getCause() instanceof ResponseStatusException response) {
-                throw response;
+        } catch (IOException exception) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
+                    "Не удалось запустить обработку PDF. Повторите запрос позже.");
+        } finally {
+            if (process != null && process.isAlive()) {
+                process.destroyForcibly();
+                // Не освобождаем слот и файлы, пока worker действительно не завершился.
+                boolean interrupted = Thread.interrupted();
+                while (true) {
+                    try {
+                        process.waitFor();
+                        break;
+                    } catch (InterruptedException exception) {
+                        interrupted = true;
+                    }
+                }
+                if (interrupted) {
+                    Thread.currentThread().interrupt();
+                }
             }
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
-                    "PDF-файл повреждён и не может быть прочитан. Проверьте файл и загрузите снова.");
+            cleanup(directory);
+            slots.release();
         }
     }
 
-    String readPdf(byte[] bytes) throws IOException {
-        try (var document = Loader.loadPDF(bytes)) {
-            if (document.isEncrypted()) {
-                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
-                        "PDF-файл защищён паролем. Снимите защиту и загрузите файл снова.");
+    private String readResult(Path file) throws IOException {
+        try (var input = new DataInputStream(Files.newInputStream(file))) {
+            int status = input.readInt();
+            int length = input.readInt();
+            if (length < 0 || length > 40000) {
+                throw new IOException("Invalid worker response");
             }
-            if (document.getNumberOfPages() > 50) {
-                throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE,
-                        "PDF содержит слишком много страниц. Максимум: 50 страниц.");
+            byte[] data = input.readNBytes(length);
+            if (data.length != length) {
+                throw new IOException("Incomplete worker response");
             }
-            var stripper = new PDFTextStripper();
-            stripper.setSortByPosition(true);
-            var output = new StringBuilder();
-            // Останавливаем извлечение при достижении лимита, не обрезаем результат.
-            stripper.writeText(document, new Writer() {
-                @Override
-                public void write(char[] chars, int offset, int length) throws IOException {
-                    if (Thread.currentThread().isInterrupted()) {
-                        throw new IOException("PDF parsing interrupted");
-                    }
-                    output.append(chars, offset, length);
-                    if (output.codePointCount(0, output.length()) > 10000) {
-                        throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE,
-                                "Максимальная длина текста — 10000 символов.");
-                    }
-                }
-
-                @Override
-                public void flush() {
-                }
-
-                @Override
-                public void close() {
-                }
-            });
-            String text = output.toString();
-            if (text.isBlank()) {
-                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
-                        "PDF-файл не содержит текстового слоя (возможно, это скан). "
-                                + "Загрузите PDF с распознаваемым текстом или TXT-файл.");
+            String text = new String(data, StandardCharsets.UTF_8);
+            if (status != 200) {
+                throw new ResponseStatusException(HttpStatus.valueOf(status), text);
             }
             return text;
-        } catch (InvalidPasswordException exception) {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
-                    "PDF-файл защищён паролем. Снимите защиту и загрузите файл снова.");
+        }
+    }
+
+    private void cleanup(Path directory) {
+        if (directory == null) {
+            return;
+        }
+        try (var paths = Files.walk(directory)) {
+            for (Path path : paths.sorted(Comparator.reverseOrder()).toList()) {
+                Files.deleteIfExists(path);
+            }
+        } catch (IOException exception) {
+            // Только событие: не записываем имя исходного файла, содержимое или исключение PDFBox.
+            LOG.warn("PDF temporary resource cleanup failed");
         }
     }
 }

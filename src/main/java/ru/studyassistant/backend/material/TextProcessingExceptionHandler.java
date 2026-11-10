@@ -51,13 +51,10 @@ public class TextProcessingExceptionHandler {
     /** Возвращает 502 без внутренних сведений и ответа LLM-провайдера. */
     @ExceptionHandler(LlmUnavailableException.class)
     public ResponseEntity<Map<String, Object>> handleLlmFailure(
+            LlmUnavailableException exception,
             HttpServletRequest request
     ) {
-        return problem(
-                HttpStatus.BAD_GATEWAY,
-                "Сервис обработки текста временно недоступен. Повторите запрос позже.",
-                request
-        );
+        return problem(HttpStatus.BAD_GATEWAY, exception.getMessage(), request);
     }
 
     /** Лимит multipart может сработать до входа в контроллер. */

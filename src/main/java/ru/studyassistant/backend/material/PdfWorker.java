@@ -10,6 +10,9 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.apache.pdfbox.text.PDFTextStripper;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 /** Внутренний процесс: не запускает Spring, не читает .env, не вызывает LLM. */
 public final class PdfWorker {
     private PdfWorker() { }
@@ -51,8 +54,20 @@ public final class PdfWorker {
             if (document.getNumberOfPages() > maxPages) {
                 throw new PdfProblem(413, "PDF содержит слишком много страниц. Максимум: " + maxPages + " страниц.");
             }
+
             var text = new StringBuilder();
-            var stripper = new PDFTextStripper();
+            var pages = new ArrayList<>(Collections.nCopies(document.getNumberOfPages(), ""));
+            var stripper = new PDFTextStripper() {
+                private int pageStart;
+
+                @Override
+                protected void writePageEnd() throws IOException {
+                    super.writePageEnd();
+                    pages.set(getCurrentPageNo() - 1, text.substring(pageStart));
+                    pageStart = text.length();
+                }
+            };
+
             stripper.setSortByPosition(true);
             stripper.writeText(document, new Writer() {
                 @Override
@@ -62,18 +77,27 @@ public final class PdfWorker {
                         throw new PdfProblem(413, "Максимальная длина текста — " + maxText + " символов.");
                     }
                 }
+
                 @Override
                 public void flush() { }
+
                 @Override
                 public void close() { }
             });
+
             if (text.toString().isBlank()) {
                 throw new PdfProblem(422, "PDF-файл не содержит текстового слоя (возможно, это скан). "
                         + "Загрузите PDF с распознаваемым текстом или TXT-файл.");
             }
-            return text.toString();
+
+            String cleaned = new PdfTextCleaner().clean(pages);
+            if (cleaned.codePointCount(0, cleaned.length()) > maxText) {
+                throw new PdfProblem(413, "Максимальная длина текста — " + maxText + " символов.");
+            }
+            return cleaned;
         }
     }
+
 
     private static final class PdfProblem extends IOException {
         private final int status;

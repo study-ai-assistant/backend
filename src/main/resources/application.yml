@@ -36,3 +36,9 @@ app:
     api-key: ${LLM_API_KEY:}
     base-url: ${LLM_BASE_URL:}
     model: ${LLM_MODEL:}
+  text-splitting:
+    max-characters: 24000
+    max-estimated-tokens: 10000
+    single-request-text-tokens: 4800
+    part-text-tokens: 2000
+    max-parts: 6

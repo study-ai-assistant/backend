@@ -44,11 +44,25 @@ public class GroqLlmClient implements LlmClient {
                 .build();
     }
 
-    /** Запускает обработку и ограничивает общее ожидание результата 60 секундами. */
+    /** Обрабатывает целый материал в выбранном режиме. */
     @Override
     public String generate(String text, ProcessingMode mode) {
+        return generateWithPrompt(text, LlmPrompts.forMode(mode));
+    }
 
-        var task = new FutureTask<String>(() -> generateText(text, mode));
+    /** Обрабатывает одну часть материала. */
+    public String generateChunk(String text, ProcessingMode mode) {
+        return generateWithPrompt(text, LlmPrompts.forChunk(mode));
+    }
+
+    /** Объединяет ответы по частям в итоговый результат. */
+    public String mergeResults(String results, ProcessingMode mode) {
+        return generateWithPrompt(results, LlmPrompts.forMerge(mode));
+    }
+
+    /** Запускает обработку и ограничивает общее ожидание результата 60 секундами. */
+    private String generateWithPrompt(String text, String systemPrompt) {
+        var task = new FutureTask<String>(() -> generateText(text, systemPrompt));
         Thread.startVirtualThread(task);
 
         try {
@@ -68,8 +82,8 @@ public class GroqLlmClient implements LlmClient {
         }
     }
 
-    /** Отправляет текст в Groq и извлекает конспект из ответа. */
-    private String generateText(String text, ProcessingMode mode) {
+    /** Отправляет текст в Groq и извлекает результат из ответа. */
+    private String generateText(String text, String systemPrompt) {
         if (!"groq".equalsIgnoreCase(properties.getProvider())
                 || properties.getApiKey().isBlank()
                 || properties.getModel().isBlank()
@@ -81,7 +95,7 @@ public class GroqLlmClient implements LlmClient {
         var messages = List.of(
                 Map.of(
                         "role", "system",
-                        "content", LlmPrompts.forMode(mode)
+                        "content", systemPrompt
                 ),
                 Map.of("role", "user", "content", text)
         );
@@ -151,7 +165,7 @@ public class GroqLlmClient implements LlmClient {
         }
     }
 
-    /** Структура ответа Groq. дополнительные поля JSON игнорируются. */
+    /** Структура ответа Groq. Дополнительные поля JSON игнорируются. */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record GroqResponse(List<Choice> choices) {}
 

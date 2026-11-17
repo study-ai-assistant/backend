@@ -32,6 +32,11 @@ public class MaterialService {
     }
 
     public ProcessingResult process(MultipartFile file, ProcessingMode mode) {
+        String text = extract(file, MAX_TEXT_LENGTH);
+        return new ProcessingResult(mode, llmClient.generate(text, mode));
+    }
+
+    public String extract(MultipartFile file, int maxCharacters) {
         // 1. Проверка расширения файла
         String filename = file.getOriginalFilename();
         if (filename == null || !hasAllowedExtension(filename)) {
@@ -61,7 +66,7 @@ public class MaterialService {
                         "Содержимое файла не соответствует формату TXT или PDF.");
             }
             if (pdfContent) {
-                text = pdfTextExtractor.extract(bytes);
+                text = pdfTextExtractor.extract(bytes, maxCharacters);
             } else {
                 try (var input = new ByteArrayInputStream(bytes)) {
                     text = textExtractor.extract(input, filename);
@@ -85,16 +90,14 @@ public class MaterialService {
         }
 
         // 5. Проверка длины текста (Unicode символы)
-        if (text.codePointCount(0, text.length()) > MAX_TEXT_LENGTH) {
+        if (text.codePointCount(0, text.length()) > maxCharacters) {
             throw new ResponseStatusException(
                     HttpStatus.PAYLOAD_TOO_LARGE,
-                    "Текст в файле превышает максимальную длину в 10000 символов."
+                    "Текст в файле превышает максимальную длину в " + maxCharacters + " символов."
             );
         }
 
-        // 6. Обработка текста через LLM
-        String result = llmClient.generate(text, mode);
-        return new ProcessingResult(mode, result);
+        return text;
     }
 
     private boolean hasBinaryContent(byte[] bytes) {

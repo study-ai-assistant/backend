@@ -42,3 +42,11 @@ app:
     single-request-text-tokens: 4800
     part-text-tokens: 2000
     max-parts: 6
+  jobs:
+    retention: ${JOB_RETENTION:1h}
+    capacity: ${JOB_CAPACITY:100}
+  llm-quota:
+    tokens-per-minute: ${LLM_TOKENS_PER_MINUTE:8000}
+    requests-per-minute: ${LLM_REQUESTS_PER_MINUTE:30}
+    tokens-per-day: ${LLM_TOKENS_PER_DAY:200000}
+    requests-per-day: ${LLM_REQUESTS_PER_DAY:1000}

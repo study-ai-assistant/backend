@@ -29,6 +29,10 @@ public class PdfTextExtractor {
     }
 
     public String extract(byte[] bytes) {
+        return extract(bytes, 10000);
+    }
+
+    public String extract(byte[] bytes, int maxCharacters) {
         if (!slots.tryAcquire()) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
                     "Сервис разбора PDF занят. Повторите запрос позже.");
@@ -38,7 +42,8 @@ public class PdfTextExtractor {
         try {
             directory = Files.createTempDirectory(properties.getTempDirectory(), "study-pdf-");
             Files.write(directory.resolve("input.pdf"), bytes);
-            process = launcher.start(directory, properties);
+            process = maxCharacters == 10000 ? launcher.start(directory, properties)
+                    : launcher.start(directory, properties, maxCharacters);
             process.getOutputStream().close();
             if (!process.waitFor(properties.getTimeout().toMillis(), TimeUnit.MILLISECONDS)) {
                 throw new ResponseStatusException(HttpStatus.GATEWAY_TIMEOUT,
@@ -81,7 +86,7 @@ public class PdfTextExtractor {
         try (var input = new DataInputStream(Files.newInputStream(file))) {
             int status = input.readInt();
             int length = input.readInt();
-            if (length < 0 || length > 40000) {
+            if (length < 0 || length > 96000) {
                 throw new IOException("Invalid worker response");
             }
             byte[] data = input.readNBytes(length);

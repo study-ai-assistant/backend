@@ -225,6 +225,29 @@ class GroqLlmClientTests {
     }
 
     /** Настраивает ответ локального сервера и записывает входящий запрос. */
+    @Test
+    void rejectsTruncatedAnswerAndReadsUsage() throws Exception {
+        respondWith(200, """
+                {"choices":[{"message":{"content":"Неполный ответ"},"finish_reason":"length"}]}
+                """);
+        assertThatThrownBy(() -> client.generateChunk("Текст", ProcessingMode.SHORT_SUMMARY))
+                .isInstanceOf(LlmUnavailableException.class);
+        assertThat(client.lastUsage()).isNull();
+    }
+
+    @Test
+    void recordsActualTokensAndCapsCompletionBudget() throws Exception {
+        respondWith(200, """
+                {"choices":[{"message":{"content":"Результат"},"finish_reason":"stop"}],
+                 "usage":{"prompt_tokens":150,"completion_tokens":70}}
+                """);
+        client.generateChunk("Текст", ProcessingMode.KEY_TERMS);
+        assertThat(client.lastUsage()).isEqualTo(new LlmClient.Usage(150, 70));
+        var body = mapper.readTree(received.get().body());
+        assertThat(body.path("max_completion_tokens").asInt()).isEqualTo(1600);
+        assertThat(body.path("reasoning_effort").asText()).isEqualTo("low");
+    }
+
     private void respondWith(int status, String body) {
         server.createContext("/chat/completions", exchange -> {
             try {

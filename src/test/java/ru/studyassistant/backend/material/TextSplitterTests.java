@@ -43,7 +43,7 @@ class TextSplitterTests {
     @Test
     void splitsLongParagraphBySentences() {
         properties.setSingleRequestTextTokens(4);
-        properties.setPartTextTokens(4);
+        properties.setPartTextTokens(5);
         String text = "One is here. Two is here.";
 
         assertThat(splitter.split(text))

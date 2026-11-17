@@ -1,0 +1,336 @@
+[
+  {
+    "file": "results/long/6-parts-KEY_TERMS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "term_count": 39,
+    "exact_duplicate_terms": 0
+  },
+  {
+    "file": "results/long/6-parts-SIMPLE_EXPLANATION.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "results/long/4-parts-KEY_TERMS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "term_count": 26,
+    "exact_duplicate_terms": 0
+  },
+  {
+    "file": "results/long/4-parts-DETAILED_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": true
+  },
+  {
+    "file": "results/long/2-parts-SHORT_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "results/long/2-parts-SELF_CHECK_QUESTIONS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "question_count": 8,
+    "exact_duplicates": 0,
+    "within_ten": true
+  },
+  {
+    "file": "results/long/2-parts-SIMPLE_EXPLANATION.txt",
+    "empty": false,
+    "markdown_markers": true
+  },
+  {
+    "file": "results/long/4-parts-SELF_CHECK_QUESTIONS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "question_count": 10,
+    "exact_duplicates": 0,
+    "within_ten": true
+  },
+  {
+    "file": "results/long/4-parts-SHORT_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "results/long/2-parts-KEY_TERMS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "term_count": 11,
+    "exact_duplicate_terms": 0
+  },
+  {
+    "file": "results/long/6-parts-DETAILED_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": true
+  },
+  {
+    "file": "results/long/2-parts-DETAILED_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "results/long/6-parts-SHORT_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "results/long/4-parts-SIMPLE_EXPLANATION.txt",
+    "empty": false,
+    "markdown_markers": true
+  },
+  {
+    "file": "results/long/6-parts-SELF_CHECK_QUESTIONS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "question_count": 10,
+    "exact_duplicates": 0,
+    "within_ten": true
+  },
+  {
+    "file": "results/demo/short-text-SELF_CHECK_QUESTIONS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "question_count": 8,
+    "exact_duplicates": 0,
+    "within_ten": true
+  },
+  {
+    "file": "results/demo/short-text-SHORT_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "results/demo/short-text-KEY_TERMS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "term_count": 7,
+    "exact_duplicate_terms": 0
+  },
+  {
+    "file": "results/demo/short-txt-SELF_CHECK_QUESTIONS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "question_count": 7,
+    "exact_duplicates": 0,
+    "within_ten": true
+  },
+  {
+    "file": "results/demo/short-pdf-SHORT_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "results/demo/short-text-DETAILED_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "results/demo/short-txt-KEY_TERMS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "term_count": 8,
+    "exact_duplicate_terms": 0
+  },
+  {
+    "file": "results/demo/short-txt-SHORT_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "results/demo/short-txt-DETAILED_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "results/demo/short-txt-SIMPLE_EXPLANATION.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "results/demo/short-text-SIMPLE_EXPLANATION.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "results/recheck/2-parts-SELF_CHECK_QUESTIONS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "question_count": 4,
+    "exact_duplicates": 0,
+    "within_ten": true
+  },
+  {
+    "file": "results/recheck/4-parts-SELF_CHECK_QUESTIONS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "question_count": 6,
+    "exact_duplicates": 0,
+    "within_ten": true
+  },
+  {
+    "file": "results/recheck/6-parts-SELF_CHECK_QUESTIONS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "question_count": 6,
+    "exact_duplicates": 0,
+    "within_ten": true
+  },
+  {
+    "file": "examples/6-parts-KEY_TERMS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "term_count": 39,
+    "exact_duplicate_terms": 0
+  },
+  {
+    "file": "examples/short-text-SELF_CHECK_QUESTIONS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "question_count": 8,
+    "exact_duplicates": 0,
+    "within_ten": true
+  },
+  {
+    "file": "examples/short-text-SHORT_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "examples/6-parts-SIMPLE_EXPLANATION.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "examples/short-text-KEY_TERMS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "term_count": 7,
+    "exact_duplicate_terms": 0
+  },
+  {
+    "file": "examples/short-txt-SELF_CHECK_QUESTIONS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "question_count": 7,
+    "exact_duplicates": 0,
+    "within_ten": true
+  },
+  {
+    "file": "examples/4-parts-KEY_TERMS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "term_count": 26,
+    "exact_duplicate_terms": 0
+  },
+  {
+    "file": "examples/4-parts-DETAILED_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "examples/2-parts-SHORT_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "examples/short-pdf-SHORT_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "examples/short-text-DETAILED_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "examples/2-parts-SELF_CHECK_QUESTIONS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "question_count": 4,
+    "exact_duplicates": 0,
+    "within_ten": true
+  },
+  {
+    "file": "examples/2-parts-SIMPLE_EXPLANATION.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "examples/4-parts-SELF_CHECK_QUESTIONS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "question_count": 6,
+    "exact_duplicates": 0,
+    "within_ten": true
+  },
+  {
+    "file": "examples/short-txt-KEY_TERMS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "term_count": 8,
+    "exact_duplicate_terms": 0
+  },
+  {
+    "file": "examples/4-parts-SHORT_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "examples/2-parts-KEY_TERMS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "term_count": 11,
+    "exact_duplicate_terms": 0
+  },
+  {
+    "file": "examples/short-txt-SHORT_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "examples/6-parts-DETAILED_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "examples/short-txt-DETAILED_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "examples/2-parts-DETAILED_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "examples/6-parts-SHORT_SUMMARY.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "examples/4-parts-SIMPLE_EXPLANATION.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "examples/short-txt-SIMPLE_EXPLANATION.txt",
+    "empty": false,
+    "markdown_markers": false
+  },
+  {
+    "file": "examples/6-parts-SELF_CHECK_QUESTIONS.txt",
+    "empty": false,
+    "markdown_markers": false,
+    "question_count": 6,
+    "exact_duplicates": 0,
+    "within_ten": true
+  },
+  {
+    "file": "examples/short-text-SIMPLE_EXPLANATION.txt",
+    "empty": false,
+    "markdown_markers": false
+  }
+]

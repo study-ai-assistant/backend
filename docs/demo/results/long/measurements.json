@@ -1,0 +1,698 @@
+[
+  {
+    "name": "2-parts",
+    "file": "benchmark-2-parts.txt",
+    "mode": "SHORT_SUMMARY",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 64.48,
+    "parts": 2,
+    "prompt_tokens": 4434,
+    "completion_tokens": 617,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        2
+      ],
+      [
+        "RUNNING",
+        "MERGE",
+        2,
+        2
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        2,
+        2
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "2-parts",
+    "file": "benchmark-2-parts.txt",
+    "mode": "DETAILED_SUMMARY",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 63.14,
+    "parts": 2,
+    "prompt_tokens": 5202,
+    "completion_tokens": 1707,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        2
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        1,
+        2
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        2,
+        2
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "2-parts",
+    "file": "benchmark-2-parts.txt",
+    "mode": "SIMPLE_EXPLANATION",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 120.26,
+    "parts": 2,
+    "prompt_tokens": 4567,
+    "completion_tokens": 908,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        2
+      ],
+      [
+        "RUNNING",
+        "MERGE",
+        2,
+        2
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        2,
+        2
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "2-parts",
+    "file": "benchmark-2-parts.txt",
+    "mode": "SELF_CHECK_QUESTIONS",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 63.12,
+    "parts": 2,
+    "prompt_tokens": 4510,
+    "completion_tokens": 607,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        2
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        1,
+        2
+      ],
+      [
+        "RUNNING",
+        "MERGE",
+        2,
+        2
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        2,
+        2
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "2-parts",
+    "file": "benchmark-2-parts.txt",
+    "mode": "KEY_TERMS",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 120.3,
+    "parts": 2,
+    "prompt_tokens": 4656,
+    "completion_tokens": 967,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        2
+      ],
+      [
+        "RUNNING",
+        "MERGE",
+        2,
+        2
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        2,
+        2
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "4-parts",
+    "file": "long-lecture.txt",
+    "mode": "SHORT_SUMMARY",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 123.29,
+    "parts": 4,
+    "prompt_tokens": 6268,
+    "completion_tokens": 1942,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        4
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        1,
+        4
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        2,
+        4
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        3,
+        4
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        4,
+        4
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "4-parts",
+    "file": "long-lecture.txt",
+    "mode": "DETAILED_SUMMARY",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 183.37,
+    "parts": 4,
+    "prompt_tokens": 6656,
+    "completion_tokens": 2943,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        4
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        1,
+        4
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        2,
+        4
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        3,
+        4
+      ],
+      [
+        "RUNNING",
+        "MERGE",
+        4,
+        4
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        4,
+        4
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "4-parts",
+    "file": "long-lecture.txt",
+    "mode": "SIMPLE_EXPLANATION",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 126.22,
+    "parts": 4,
+    "prompt_tokens": 6153,
+    "completion_tokens": 2316,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        4
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        1,
+        4
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        2,
+        4
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        3,
+        4
+      ],
+      [
+        "RUNNING",
+        "MERGE",
+        4,
+        4
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        4,
+        4
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "4-parts",
+    "file": "long-lecture.txt",
+    "mode": "SELF_CHECK_QUESTIONS",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 177.33,
+    "parts": 4,
+    "prompt_tokens": 5549,
+    "completion_tokens": 1035,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        4
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        1,
+        4
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        2,
+        4
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        3,
+        4
+      ],
+      [
+        "RUNNING",
+        "MERGE",
+        4,
+        4
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        4,
+        4
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "4-parts",
+    "file": "long-lecture.txt",
+    "mode": "KEY_TERMS",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 126.26,
+    "parts": 4,
+    "prompt_tokens": 5687,
+    "completion_tokens": 2007,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        4
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        1,
+        4
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        2,
+        4
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        3,
+        4
+      ],
+      [
+        "RUNNING",
+        "MERGE",
+        4,
+        4
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        4,
+        4
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "6-parts",
+    "file": "long-lecture.pdf",
+    "mode": "SHORT_SUMMARY",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 239.41,
+    "parts": 6,
+    "prompt_tokens": 9241,
+    "completion_tokens": 2658,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        1,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        2,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        3,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        4,
+        6
+      ],
+      [
+        "RUNNING",
+        "MERGE",
+        6,
+        6
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        6,
+        6
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "6-parts",
+    "file": "long-lecture.pdf",
+    "mode": "DETAILED_SUMMARY",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 191.09,
+    "parts": 6,
+    "prompt_tokens": 9361,
+    "completion_tokens": 4039,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        1,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        2,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        3,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        4,
+        6
+      ],
+      [
+        "RUNNING",
+        "MERGE",
+        6,
+        6
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        6,
+        6
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "6-parts",
+    "file": "long-lecture.pdf",
+    "mode": "SIMPLE_EXPLANATION",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 191.05,
+    "parts": 6,
+    "prompt_tokens": 8822,
+    "completion_tokens": 2709,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        1,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        2,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        3,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        4,
+        6
+      ],
+      [
+        "RUNNING",
+        "MERGE",
+        6,
+        6
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        6,
+        6
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "6-parts",
+    "file": "long-lecture.pdf",
+    "mode": "SELF_CHECK_QUESTIONS",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 188.13,
+    "parts": 6,
+    "prompt_tokens": 8113,
+    "completion_tokens": 1630,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        1,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        2,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        3,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        4,
+        6
+      ],
+      [
+        "RUNNING",
+        "MERGE",
+        6,
+        6
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        6,
+        6
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "6-parts",
+    "file": "long-lecture.pdf",
+    "mode": "KEY_TERMS",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 191.02,
+    "parts": 6,
+    "prompt_tokens": 8581,
+    "completion_tokens": 3287,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        1,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        2,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        3,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        4,
+        6
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        5,
+        6
+      ],
+      [
+        "RUNNING",
+        "MERGE",
+        6,
+        6
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        6,
+        6
+      ]
+    ],
+    "error": null
+  }
+]

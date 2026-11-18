@@ -138,3 +138,78 @@ PDF разбирается отдельным Java-процессом с огр�
 [src/test/resources/pdf/README.md](../../src/test/resources/pdf/README.md).
 Результаты проверки пяти учебных материалов — в
 [отчёте](../research/PDF_VALIDATION.md).
+
+## Фоновая обработка
+
+Маршруты: `POST /api/v1/jobs/text` (JSON text/mode),
+`POST /api/v1/jobs/materials` (multipart file/mode), `GET /api/v1/jobs/{id}`.
+Формат JSON остаётся тем же, меняется URL. Пример без ручного экранирования
+многострочного текста:
+
+```bash
+python3 - <<'PYTHON'
+import json
+from pathlib import Path
+Path('/tmp/long-request.json').write_text(json.dumps({
+    'text': Path('docs/demo/long-lecture.txt').read_text(),
+    'mode': 'KEY_TERMS'
+}))
+PYTHON
+curl -i http://localhost:8080/api/v1/jobs/text \
+  -H 'Content-Type: application/json' --data-binary @/tmp/long-request.json
+```
+
+Создание: 202 + Location и Retry-After: 3. Ответ содержит id, status, mode,
+completedParts, totalParts, stage, createdAt, expiresAt, result, error,
+promptTokens, completionTokens и elapsedMillis. У очереди и выполняющегося
+задания result/error/expiresAt могут быть null. Полный пример состояния:
+
+```json
+{
+  "id": "42c471b4-57bf-454d-a1ed-d28746449b31",
+  "status": "RUNNING",
+  "mode": "KEY_TERMS",
+  "completedParts": 2,
+  "totalParts": 6,
+  "stage": "CHUNKS",
+  "createdAt": "2026-11-18T00:00:00Z",
+  "expiresAt": null,
+  "result": null,
+  "error": null,
+  "promptTokens": 2200,
+  "completionTokens": 500,
+  "elapsedMillis": 65000
+}
+```
+
+Это иллюстрация формата. Прогресс не является оценкой оставшегося времени.
+Опрашивайте GET раз в 3 секунды до SUCCEEDED/FAILED. Во время MERGE все части
+могут быть готовы; нужно дождаться итогового статуса. Чтение статуса всегда
+200, даже если само задание FAILED. Пример поля error при ошибке второй части:
+
+```json
+{"status":502,"code":"LLM_RATE_LIMIT","detail":"Лимит сервиса обработки текста исчерпан. Повторите запрос позже.","part":2}
+```
+
+При ошибке объединения part=null. Другие коды: LLM_TIMEOUT, LLM_UNAVAILABLE,
+PROCESSING_FAILED. Содержимое неудачного ответа провайдера не раскрывается,
+автоматических повторов нет. Сетевой вызов ограничен 60 секундами; ожидание
+локальной квоты в этот таймаут не входит.
+
+Короткий материал (до 10000 символов и бюджета одного вызова) на новом маршруте
+даёт 400 с указанием старых маршрутов. Превышение 24000 символов, 10000 токенов
+или 6 частей — 413 до создания задания. Проверяются и UTF-8/4, и o200k;
+это консервативная граница, текст не обрезается. Для файла дополнительно
+сохраняются 10 МиБ, настройки страниц/таймаута PDF и ошибки 415/422/504.
+Извлечение выполняется перед приёмом задания.
+
+Результат хранится час после завершения (JOB_RETENTION); лимит записей
+JOB_CAPACITY=100, заполнение — 503. Нет постоянного хранения и восстановления
+после перезапуска. Неизвестное и просроченное задание дают одинаковый 404.
+Контракт находится в [openapi.yaml](openapi.yaml); согласование с mobile
+требует отдельного review, оно не заменяется автоматической валидацией YAML.
+
+Короткий синхронный запрос не ждёт освобождения минутной квоты: при занятости
+получает 502 с описанием лимита, как при внешнем 429. Ожидание выполняется
+только фоновыми заданиями. Поэтому синхронный маршрут сохраняет прежний
+сетевой таймаут 60 секунд и рекомендацию клиенту 90 секунд.

@@ -15,6 +15,7 @@ class OpenApiContractTests {
         assertThat(result.getMessages()).isEmpty();
         assertThat(result.getOpenAPI()).isNotNull();
         assertThat(result.getOpenAPI().getPaths()).containsKeys("/health", "/actuator/health", "/api/v1/modes",
-                "/api/v1/text/process", "/api/v1/materials/process");
+                "/api/v1/text/process", "/api/v1/materials/process",
+                "/api/v1/jobs/text", "/api/v1/jobs/materials", "/api/v1/jobs/{id}");
     }
 }

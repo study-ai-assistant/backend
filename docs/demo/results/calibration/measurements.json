@@ -1,0 +1,229 @@
+[
+  {
+    "name": "2-parts",
+    "file": "benchmark-2-parts.txt",
+    "mode": "SHORT_SUMMARY",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 6.76,
+    "parts": 2,
+    "prompt_tokens": 4582,
+    "completion_tokens": 928,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        2
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        1,
+        2
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        2,
+        2
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "2-parts",
+    "file": "benchmark-2-parts.txt",
+    "mode": "DETAILED_SUMMARY",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 123.25,
+    "parts": 2,
+    "prompt_tokens": 5285,
+    "completion_tokens": 2645,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        2
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        1,
+        2
+      ],
+      [
+        "RUNNING",
+        "MERGE",
+        2,
+        2
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        2,
+        2
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "2-parts",
+    "file": "benchmark-2-parts.txt",
+    "mode": "SIMPLE_EXPLANATION",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 63.14,
+    "parts": 2,
+    "prompt_tokens": 4871,
+    "completion_tokens": 1540,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        2
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        1,
+        2
+      ],
+      [
+        "RUNNING",
+        "MERGE",
+        2,
+        2
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        2,
+        2
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "2-parts",
+    "file": "benchmark-2-parts.txt",
+    "mode": "SELF_CHECK_QUESTIONS",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 114.23,
+    "parts": 2,
+    "prompt_tokens": 4996,
+    "completion_tokens": 1223,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        2
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        1,
+        2
+      ],
+      [
+        "RUNNING",
+        "MERGE",
+        2,
+        2
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        2,
+        2
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "2-parts",
+    "file": "benchmark-2-parts.txt",
+    "mode": "KEY_TERMS",
+    "http_status": 202,
+    "status": "SUCCEEDED",
+    "seconds": 69.12,
+    "parts": 2,
+    "prompt_tokens": 4901,
+    "completion_tokens": 1747,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        2
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        1,
+        2
+      ],
+      [
+        "RUNNING",
+        "MERGE",
+        2,
+        2
+      ],
+      [
+        "SUCCEEDED",
+        "FINISHED",
+        2,
+        2
+      ]
+    ],
+    "error": null
+  },
+  {
+    "name": "4-parts",
+    "file": "benchmark-4-parts.txt",
+    "mode": "SHORT_SUMMARY",
+    "http_status": 202,
+    "status": "FAILED",
+    "seconds": 63.13,
+    "parts": 4,
+    "prompt_tokens": 2066,
+    "completion_tokens": 1352,
+    "transitions": [
+      [
+        "RUNNING",
+        "CHUNKS",
+        0,
+        4
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        1,
+        4
+      ],
+      [
+        "RUNNING",
+        "CHUNKS",
+        2,
+        4
+      ],
+      [
+        "FAILED",
+        "FINISHED",
+        2,
+        4
+      ]
+    ],
+    "error": {
+      "status": 502,
+      "code": "LLM_UNAVAILABLE",
+      "detail": "Сервис обработки текста временно недоступен. Повторите запрос позже.",
+      "part": 3
+    }
+  }
+]

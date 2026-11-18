@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: ИИ-помощник для учёбы — API
-  version: 0.1.0
+  version: 0.2.0
   description: |
     Реализованный API текста; изменения контракта согласовываются с mobile (задача #4).
     GET /health и GET /api/v1/modes реализованы.
@@ -396,8 +396,158 @@ paths:
                 status: 504
                 detail: Превышено время обработки файла. Попробуйте файл меньшего размера или сложности.
                 instance: /api/v1/materials/process
+  /api/v1/jobs/text:
+    post:
+      operationId: createTextJob
+      summary: Создать фоновое задание для длинного текста
+      description: |
+        До 24000 Unicode-кодовых точек и 10000 токенов, до 6 частей.
+        Проверяются оценка UTF-8/4 и обычный словарь o200k; действует более строгий результат.
+        Материал до 10000 символов, помещающийся в бюджет одного вызова, получает 400
+        с рекомендацией синхронного маршрута. Текст не обрезается.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [text, mode]
+              properties:
+                text: {type: string, minLength: 1, maxLength: 24000}
+                mode: {$ref: '#/components/schemas/ProcessingMode'}
+      responses:
+        '202': {$ref: '#/components/responses/JobAccepted'}
+        '400': {$ref: '#/components/responses/JobBadRequest'}
+        '413': {$ref: '#/components/responses/JobLimit'}
+        '503': {$ref: '#/components/responses/JobBusy'}
+  /api/v1/jobs/materials:
+    post:
+      operationId: createMaterialJob
+      summary: Создать фоновое задание для длинного TXT или PDF
+      description: |
+        Один файл до 10 МиБ. PDF с текстовым слоем, до 50 страниц по умолчанию.
+        Извлечение и проверка лимитов выполняются до 202, после приёма LLM работает в очереди.
+        До 24000 символов, 10000 токенов и 6 частей; без OCR и обхода пароля.
+        Ошибки извлечения и формата совпадают с /api/v1/materials/process.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, mode]
+              properties:
+                file: {type: string, format: binary}
+                mode: {$ref: '#/components/schemas/ProcessingMode'}
+      responses:
+        '202': {$ref: '#/components/responses/JobAccepted'}
+        '400': {$ref: '#/components/responses/JobBadRequest'}
+        '413': {$ref: '#/components/responses/JobLimit'}
+        '415':
+          description: Неподдерживаемый формат
+          content:
+            application/problem+json:
+              schema: {$ref: '#/components/schemas/Problem'}
+        '422':
+          description: Скан, пароль или повреждённый PDF
+          content:
+            application/problem+json:
+              schema: {$ref: '#/components/schemas/Problem'}
+        '503': {$ref: '#/components/responses/JobBusy'}
+        '504':
+          description: Таймаут извлечения PDF
+          content:
+            application/problem+json:
+              schema: {$ref: '#/components/schemas/Problem'}
+  /api/v1/jobs/{id}:
+    get:
+      operationId: getJob
+      summary: Получить статус, прогресс и результат задания
+      description: |
+        Опрашивайте раз в 3 секунды (Retry-After). QUEUED → RUNNING → SUCCEEDED или FAILED.
+        completedParts увеличивается после успешной части; при MERGE все части готовы,
+        но результата ещё нет. Готовый результат и ошибка хранятся 1 час после завершения
+        (JOB_RETENTION). После удаления или перезапуска — 404, повторно отправьте материал.
+        Ошибки LLM находятся в error задания при HTTP 200; частичный результат не выдаётся.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: {type: string}
+      responses:
+        '200':
+          description: Состояние задания
+          headers:
+            Retry-After: {schema: {type: integer, example: 3}, description: Интервал опроса в секундах}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Job'}
+        '404':
+          description: Задание не найдено или срок хранения истёк
+          content:
+            application/problem+json:
+              schema: {$ref: '#/components/schemas/Problem'}
+              example:
+                type: about:blank
+                title: Not Found
+                status: 404
+                detail: Задание не найдено или срок хранения истёк. Отправьте материал заново.
+                instance: /api/v1/jobs/unknown
 components:
+  responses:
+    JobAccepted:
+      description: Задание принято; Location содержит URL опроса, результат пока отсутствует
+      headers:
+        Location: {schema: {type: string}, description: URL статуса задания}
+        Retry-After: {schema: {type: integer, example: 3}, description: Интервал опроса в секундах}
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Job'}
+    JobBadRequest:
+      description: Некорректные поля, пустой материал или короткий материал для синхронного маршрута
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/Problem'}
+    JobLimit:
+      description: Превышен размер файла, число страниц, символов, токенов или частей
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/Problem'}
+    JobBusy:
+      description: Очередь заполнена или PDF worker занят/недоступен
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/Problem'}
   schemas:
+    Job:
+      type: object
+      required: [id, status, mode, completedParts, totalParts, stage, createdAt, elapsedMillis,
+                 promptTokens, completionTokens]
+      properties:
+        id: {type: string, format: uuid}
+        status: {type: string, enum: [QUEUED, RUNNING, SUCCEEDED, FAILED]}
+        mode: {$ref: '#/components/schemas/ProcessingMode'}
+        completedParts: {type: integer, minimum: 0}
+        totalParts: {type: integer, minimum: 2, maximum: 6}
+        stage: {type: string, enum: [QUEUED, CHUNKS, MERGE, FINISHED]}
+        createdAt: {type: string, format: date-time}
+        expiresAt: {type: string, format: date-time, nullable: true}
+        result: {type: string, nullable: true, description: Только при SUCCEEDED}
+        error:
+          type: object
+          nullable: true
+          required: [status, code, detail]
+          properties:
+            status: {type: integer, example: 502}
+            code:
+              type: string
+              enum: [LLM_RATE_LIMIT, LLM_TIMEOUT, LLM_UNAVAILABLE, PROCESSING_FAILED]
+            detail: {type: string}
+            part: {type: integer, nullable: true, description: Номер неудачной части; null для объединения}
+        promptTokens: {type: integer, format: int64, description: "Сумма полученного usage вызовов, 0 если не сообщено"}
+        completionTokens: {type: integer, format: int64, description: Включает reasoning по учёту провайдера}
+        elapsedMillis: {type: integer, format: int64, description: Время с постановки в очередь}
     ProcessingMode:
       type: string
       enum: [SHORT_SUMMARY, DETAILED_SUMMARY, SIMPLE_EXPLANATION, SELF_CHECK_QUESTIONS, KEY_TERMS]

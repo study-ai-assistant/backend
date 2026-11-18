@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-18",
+  "model": "openai/gpt-oss-120b",
+  "provider": "groq",
+  "minute_token_reserve": 8000,
+  "minute_request_limit": 30,
+  "minute_window_seconds": 61,
+  "chunk_max_completion_tokens": 1600,
+  "merge_max_completion_tokens": 2400,
+  "reasoning_effort": "low",
+  "daily_budget_for_final_run": 160000,
+  "daily_request_budget_for_final_run": 980,
+  "prior_calibration_reserved_daily_budget": 40000,
+  "retention": "1h",
+  "input_sources": "original project teaching examples, CC0",
+  "inputs": {
+    "benchmark-2-parts.txt": "dfe5ffaa77375fb55bd65b42e6833e23c2812f7c947939041d205bc7df7b101d",
+    "long-lecture.txt": "8792cd269ec0178404d42e86d2c0310eda4ef636b46ea74ad562ee1fb0550a5a",
+    "long-lecture.pdf": "47ed9aa5055b0c7339b8a634e176786dfc9235f8ac63eccae376406feaaa369b",
+    "short-text.txt": "992fdb0ab08438077e705a2850cce83b55f57dfa665af1b0a6e83db7a5cbe310",
+    "short-file.txt": "5412a6f51151d1f0b9bb1fb1df8daa3460b8b6f8e683bd4867d39a582396bf6b",
+    "study-notes.pdf": "277131a68cf74b23a3355b83fd25f75ee1f8582aa13effde9fe864cacddfe003"
+  },
+  "calibration_unknown_call_upper_with_safety": 2320,
+  "calibration_known_tokens": 36136,
+  "verification_remaining_daily_budget": 34372,
+  "calibration_unknown_call_calculation": "o200k(part 3)+o200k(forChunk@34c6a1a)+800 completion+64 overhead+500 safety"
+}

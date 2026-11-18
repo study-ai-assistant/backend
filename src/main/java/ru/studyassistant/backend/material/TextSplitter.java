@@ -24,11 +24,12 @@ public class TextSplitter {
             throw new IllegalArgumentException("Материал превышает лимит символов.");
         }
 
-        int tokens = (text.codePoints().map(TextSplitter::utf8Bytes).sum() + 3) / 4;
+        int estimatedTokens = (text.codePoints().map(TextSplitter::utf8Bytes).sum() + 3) / 4;
+        int tokens = Math.max(estimatedTokens, ru.studyassistant.backend.llm.TokenCounter.count(text));
         if (tokens > properties.getMaxEstimatedTokens()) {
             throw new IllegalArgumentException("Материал превышает лимит токенов.");
         }
-        if (tokens <= properties.getSingleRequestTextTokens()) {
+        if (tokens <= properties.getSingleRequestTextTokens() && text.codePointCount(0, text.length()) <= 10000) {
             return List.of(text);
         }
 
@@ -66,6 +67,20 @@ public class TextSplitter {
             end += Character.charCount(character);
         }
 
+        if (ru.studyassistant.backend.llm.TokenCounter.count(text.substring(start, end))
+                > properties.getPartTextTokens()) {
+            int low = 0;
+            int high = text.codePointCount(start, end);
+            while (low < high) {
+                int middle = (low + high + 1) / 2;
+                int candidate = text.offsetByCodePoints(start, middle);
+                if (ru.studyassistant.backend.llm.TokenCounter.count(text.substring(start, candidate))
+                        <= properties.getPartTextTokens()) { low = middle; }
+                else { high = middle - 1; }
+            }
+            if (low == 0) { throw new IllegalArgumentException("Один символ превышает лимит токенов части."); }
+            end = text.offsetByCodePoints(start, low);
+        }
         return end;
     }
 

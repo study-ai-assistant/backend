@@ -12,6 +12,10 @@ import ru.studyassistant.backend.BackendApplication;
 @Component
 public class PdfWorkerLauncher {
     public Process start(Path directory, PdfProperties properties) throws IOException {
+        return start(directory, properties, 10000);
+    }
+
+    public Process start(Path directory, PdfProperties properties, int maxCharacters) throws IOException {
         var args = new ArrayList<String>();
         args.add(Path.of(System.getProperty("java.home"), "bin", "java").toString());
         args.add("-Xmx" + properties.getWorkerHeapMb() + "m");
@@ -28,7 +32,8 @@ public class PdfWorkerLauncher {
                     System.getProperty("java.class.path")), BackendApplication.class.getName()));
         }
         args.addAll(List.of("--internal-pdf-worker", directory.resolve("input.pdf").toString(),
-                directory.resolve("result.bin").toString(), Integer.toString(properties.getMaxPages()), "10000"));
+                directory.resolve("result.bin").toString(), Integer.toString(properties.getMaxPages()),
+                Integer.toString(maxCharacters)));
         var builder = new ProcessBuilder(args)
                 .redirectOutput(ProcessBuilder.Redirect.DISCARD)
                 .redirectError(ProcessBuilder.Redirect.DISCARD);

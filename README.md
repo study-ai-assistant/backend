@@ -219,6 +219,9 @@ Windows: `.\mvnw.cmd` вместо `./mvnw`. verify включает линте�
 | GET /api/v1/modes | Без тела | Пять поддерживаемых идентификаторов |
 | POST /api/v1/text/process | JSON: text и mode | Результат выбранного режима через Groq |
 | POST /api/v1/materials/process | multipart: file и mode | Обработка TXT (UTF-8/Windows-1251) или PDF с текстовым слоем |
+| POST /api/v1/jobs/text | JSON: text и mode | Принять длинный текст, вернуть 202 и ID |
+| POST /api/v1/jobs/materials | multipart: file и mode | Принять длинный TXT или PDF, вернуть 202 и ID |
+| GET /api/v1/jobs/{id} | Без тела | Статус, прогресс, результат или ошибка |
 
 Рабочий запрос из Linux/macOS:
 
@@ -363,3 +366,31 @@ Docker Compose проверен на Linux. Текущие изменения и
 ## Участники
 
 Список команды — в [wiki](https://github.com/study-ai-assistant/backend/wiki).
+
+## Длинные материалы
+
+Для длинного материала используйте фоновое задание. Существующие
+`/api/v1/text/process` и `/api/v1/materials/process` продолжают работать с короткими
+материалами до 10000 символов. Новый API принимает до 24000 символов и
+10000 токенов, максимум 6 частей. Лимит проверяется до обращения к LLM.
+
+| Запрос | Назначение |
+|---|---|
+| `POST /api/v1/jobs/text` | JSON с `text` и `mode` |
+| `POST /api/v1/jobs/materials` | multipart: один `file` (TXT или PDF) и `mode` |
+| `GET /api/v1/jobs/{id}` | Статус, прогресс, результат или ошибка |
+
+Например, загрузить длинную лекцию из демо-набора:
+
+```bash
+curl -i --max-time 30 http://localhost:8080/api/v1/jobs/materials \
+  -F 'file=@docs/demo/long-lecture.txt;type=text/plain' \
+  -F 'mode=SHORT_SUMMARY'
+```
+
+Ответ — `202`, поле `id` и заголовок `Location`. Проверяйте адрес из Location
+раз в 3 секунды:
+
+```bash
+curl -i http://localhost:8080/api/v1/jobs/ID_ИЗ_ОТВЕТА
+```

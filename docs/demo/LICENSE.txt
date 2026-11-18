@@ -1,0 +1,12 @@
+Учебные тексты short-text.txt, short-file.txt, long-lecture.txt,
+benchmark-2-parts.txt созданы для этого проекта
+с использованием программного генератора tools/demo/generate_materials.py.
+Они содержат вымышленные примеры, без персональных данных и заимствованных
+учебных документов. Авторы проекта могут использовать, изменять и
+распространять эти тексты по CC0 1.0:
+https://creativecommons.org/publicdomain/zero/1.0/
+
+study-notes.pdf и long-lecture.pdf созданы из этих текстов. В PDF встроен
+шрифт DejaVu Sans. Его лицензия сохранена в FONT-LICENSE.txt.
+Ответы в results/ получены от Groq по этим материалам и приведены как
+примеры для проверки; они могут содержать неточности.

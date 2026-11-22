@@ -17,31 +17,26 @@ public class MaterialService {
     private static final long MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 МБ
     private static final int MAX_TEXT_LENGTH = 10000;
     private static final Pattern NON_WHITESPACE = Pattern.compile("\\S");
-    
-    // ДОБАВИЛИ .pdf в список разрешенных
+
     private static final List<String> ALLOWED_EXTENSIONS = List.of(".txt", ".pdf");
 
     private final TextExtractor textExtractor;
     private final LlmClient llmClient;
-    private final PdfTextExtractor pdfTextExtractor; // ДОБАВИЛИ
 
-    public MaterialService(TextExtractor textExtractor, LlmClient llmClient, PdfTextExtractor pdfTextExtractor) {
+    public MaterialService(TextExtractor textExtractor, LlmClient llmClient) {
         this.textExtractor = textExtractor;
         this.llmClient = llmClient;
-        this.pdfTextExtractor = pdfTextExtractor; // ДОБАВИЛИ
     }
 
     public ProcessingResult process(MultipartFile file, ProcessingMode mode) {
-        // 1. Проверка расширения файла
         String filename = file.getOriginalFilename();
         if (filename == null || !hasAllowedExtension(filename)) {
             throw new ResponseStatusException(
                     HttpStatus.UNSUPPORTED_MEDIA_TYPE,
-                    "Принят неподдерживаемый формат файла. Ожидался TXT или PDF." // ИЗМЕНИЛИ
+                    "Принят неподдерживаемый формат файла. Ожидаются TXT или PDF."
             );
         }
 
-        // 2. Проверка размера файла
         if (file.getSize() > MAX_FILE_SIZE_BYTES) {
             throw new ResponseStatusException(
                     HttpStatus.PAYLOAD_TOO_LARGE,
@@ -49,26 +44,17 @@ public class MaterialService {
             );
         }
 
-        // 3. Извлечение текста из файла
         String text;
-        try {
-            if (filename.toLowerCase(Locale.ROOT).endsWith(".pdf")) {
-                // НОВАЯ ЛОГИКА ДЛЯ PDF
-                text = pdfTextExtractor.extractText(file);
-            } else {
-                // СТАРАЯ ЛОГИКА ДЛЯ TXT
-                try (InputStream input = file.getInputStream()) {
-                    text = textExtractor.extract(input, filename);
-                }
-            }
+        try (InputStream input = file.getInputStream()) {
+            // TextExtractor сам разберется с PDF или TXT по имени файла
+            text = textExtractor.extract(input, filename);
         } catch (IOException e) {
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Не удалось прочитать файл."
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Не удалось извлечь текст. Файл может быть поврежден или защищен паролем."
             );
         }
 
-        // 4. Проверка, что текст не пустой
         if (text == null || !NON_WHITESPACE.matcher(text).find()) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
@@ -76,7 +62,6 @@ public class MaterialService {
             );
         }
 
-        // 5. Проверка длины текста (Unicode символы)
         if (text.codePointCount(0, text.length()) > MAX_TEXT_LENGTH) {
             throw new ResponseStatusException(
                     HttpStatus.PAYLOAD_TOO_LARGE,
@@ -84,7 +69,6 @@ public class MaterialService {
             );
         }
 
-        // 6. Обработка текста через LLM
         String result = llmClient.generate(text, mode);
         return new ProcessingResult(mode, result);
     }

@@ -53,6 +53,44 @@ paths:
       responses:
         '200':
           description: Сервер работает
+  /api/v1/text/process:
+    post:
+      operationId: processText
+      summary: Обработка учебного текста в выбранном режиме (JSON)
+      description: |
+        Принимает JSON с полями text и mode.
+        Максимальная длина текста — 10000 символов.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessTextRequest'
+      responses:
+        '200':
+          description: Текст успешно обработан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessTextResponse'
+        '400':
+          description: Неверный формат запроса или неподдерживаемый режим
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '413':
+          description: Превышена длина текста
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '502':
+          description: Ошибка внешнего LLM
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /api/v1/materials/process:
     post:
       operationId: uploadMaterial

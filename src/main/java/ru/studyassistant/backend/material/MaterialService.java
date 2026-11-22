@@ -46,7 +46,6 @@ public class MaterialService {
 
         String text;
         try (InputStream input = file.getInputStream()) {
-            // TextExtractor сам разберется с PDF или TXT по имени файла
             text = textExtractor.extract(input, filename);
         } catch (IOException e) {
             throw new ResponseStatusException(

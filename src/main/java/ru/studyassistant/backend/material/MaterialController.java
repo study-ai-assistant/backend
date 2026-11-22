@@ -27,11 +27,15 @@ public class MaterialController {
         if (files.size() != 1) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "Передайте ровно один файл (TXT или PDF)."); // ИЗМЕНИЛИ
+                    "Передайте ровно один файл (TXT или PDF)."
+            );
         }
         MultipartFile file = files.getFirst();
         if (file.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Файл пуст или не был передан");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Файл пуст или не был передан"
+            );
         }
 
         return service.process(file, mode);

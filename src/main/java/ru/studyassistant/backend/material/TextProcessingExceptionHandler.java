@@ -93,8 +93,11 @@ public class TextProcessingExceptionHandler {
         Map<String, Object> body = Map.of(
                 "type", "about:blank",
                 // Для 413 используем название, указанное в контракте
-                "title", status.value() == 413
-                        ? "Payload Too Large" : status.getReasonPhrase(),
+                "title", switch (status.value()) {
+                    case 413 -> "Payload Too Large";
+                    case 422 -> "Unprocessable Entity";
+                    default -> status.getReasonPhrase();
+                },
                 "status", status.value(),
                 "detail", detail,
                 "instance", request.getRequestURI()

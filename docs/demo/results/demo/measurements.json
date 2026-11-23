@@ -1,171 +1,261 @@
 [
-  {
-    "name": "short-text",
-    "file": "short-text.txt",
-    "mode": "SHORT_SUMMARY",
-    "http_status": 200,
-    "status": "SUCCEEDED",
-    "seconds": 0.78,
-    "parts": 1,
-    "prompt_tokens": null,
-    "completion_tokens": null,
-    "transitions": [],
-    "error": null
-  },
-  {
-    "name": "short-text",
-    "file": "short-text.txt",
-    "mode": "DETAILED_SUMMARY",
-    "http_status": 200,
-    "status": "SUCCEEDED",
-    "seconds": 0.98,
-    "parts": 1,
-    "prompt_tokens": null,
-    "completion_tokens": null,
-    "transitions": [],
-    "error": null
-  },
-  {
-    "name": "short-text",
-    "file": "short-text.txt",
-    "mode": "SIMPLE_EXPLANATION",
-    "http_status": 200,
-    "status": "SUCCEEDED",
-    "seconds": 1.74,
-    "parts": 1,
-    "prompt_tokens": null,
-    "completion_tokens": null,
-    "transitions": [],
-    "error": null
-  },
-  {
-    "name": "short-text",
-    "file": "short-text.txt",
-    "mode": "SELF_CHECK_QUESTIONS",
-    "http_status": 200,
-    "status": "SUCCEEDED",
-    "seconds": 0.57,
-    "parts": 1,
-    "prompt_tokens": null,
-    "completion_tokens": null,
-    "transitions": [],
-    "error": null
-  },
-  {
-    "name": "short-text",
-    "file": "short-text.txt",
-    "mode": "KEY_TERMS",
-    "http_status": 200,
-    "status": "SUCCEEDED",
-    "seconds": 0.78,
-    "parts": 1,
-    "prompt_tokens": null,
-    "completion_tokens": null,
-    "transitions": [],
-    "error": null
-  },
-  {
-    "name": "short-txt",
-    "file": "short-file.txt",
-    "mode": "SHORT_SUMMARY",
-    "http_status": 200,
-    "status": "SUCCEEDED",
-    "seconds": 0.5,
-    "parts": 1,
-    "prompt_tokens": null,
-    "completion_tokens": null,
-    "transitions": [],
-    "error": null
-  },
-  {
-    "name": "short-txt",
-    "file": "short-file.txt",
-    "mode": "DETAILED_SUMMARY",
-    "http_status": 200,
-    "status": "SUCCEEDED",
-    "seconds": 1.35,
-    "parts": 1,
-    "prompt_tokens": null,
-    "completion_tokens": null,
-    "transitions": [],
-    "error": null
-  },
-  {
-    "name": "short-txt",
-    "file": "short-file.txt",
-    "mode": "SIMPLE_EXPLANATION",
-    "http_status": 200,
-    "status": "SUCCEEDED",
-    "seconds": 1.49,
-    "parts": 1,
-    "prompt_tokens": null,
-    "completion_tokens": null,
-    "transitions": [],
-    "error": null
-  },
-  {
-    "name": "short-txt",
-    "file": "short-file.txt",
-    "mode": "SELF_CHECK_QUESTIONS",
-    "http_status": 200,
-    "status": "SUCCEEDED",
-    "seconds": 0.48,
-    "parts": 1,
-    "prompt_tokens": null,
-    "completion_tokens": null,
-    "transitions": [],
-    "error": null
-  },
-  {
-    "name": "short-txt",
-    "file": "short-file.txt",
-    "mode": "KEY_TERMS",
-    "http_status": 200,
-    "status": "SUCCEEDED",
-    "seconds": 2.26,
-    "parts": 1,
-    "prompt_tokens": null,
-    "completion_tokens": null,
-    "transitions": [],
-    "error": null
-  },
-  {
-    "name": "short-pdf",
-    "file": "study-notes.pdf",
-    "mode": "SHORT_SUMMARY",
-    "http_status": 200,
-    "status": "SUCCEEDED",
-    "seconds": 2.25,
-    "parts": 1,
-    "prompt_tokens": null,
-    "completion_tokens": null,
-    "transitions": [],
-    "error": null
-  },
-  {
-    "name": "short-pdf",
-    "file": "study-notes.pdf",
-    "mode": "DETAILED_SUMMARY",
-    "http_status": 502,
-    "status": "FAILED",
-    "seconds": 1.41,
-    "parts": 1,
-    "prompt_tokens": null,
-    "completion_tokens": null,
-    "transitions": [],
-    "error": "Лимит сервиса обработки текста исчерпан. Повторите запрос позже."
-  },
-  {
-    "name": "short-pdf",
-    "file": "study-notes.pdf",
-    "mode": "DETAILED_SUMMARY",
-    "http_status": 502,
-    "status": "FAILED",
-    "seconds": 1.72,
-    "parts": 1,
-    "prompt_tokens": null,
-    "completion_tokens": null,
-    "transitions": [],
-    "error": "Лимит сервиса обработки текста исчерпан. Повторите запрос позже."
-  }
+    {
+        "name":  "short-text",
+        "file":  "short-text.txt",
+        "mode":  "SHORT_SUMMARY",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  0.78,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    },
+    {
+        "name":  "short-text",
+        "file":  "short-text.txt",
+        "mode":  "DETAILED_SUMMARY",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  0.98,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    },
+    {
+        "name":  "short-text",
+        "file":  "short-text.txt",
+        "mode":  "SIMPLE_EXPLANATION",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  1.74,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    },
+    {
+        "name":  "short-text",
+        "file":  "short-text.txt",
+        "mode":  "SELF_CHECK_QUESTIONS",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  0.57,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    },
+    {
+        "name":  "short-text",
+        "file":  "short-text.txt",
+        "mode":  "KEY_TERMS",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  0.78,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    },
+    {
+        "name":  "short-txt",
+        "file":  "short-file.txt",
+        "mode":  "SHORT_SUMMARY",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  0.5,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    },
+    {
+        "name":  "short-txt",
+        "file":  "short-file.txt",
+        "mode":  "DETAILED_SUMMARY",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  1.35,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    },
+    {
+        "name":  "short-txt",
+        "file":  "short-file.txt",
+        "mode":  "SIMPLE_EXPLANATION",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  1.49,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    },
+    {
+        "name":  "short-txt",
+        "file":  "short-file.txt",
+        "mode":  "SELF_CHECK_QUESTIONS",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  0.48,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    },
+    {
+        "name":  "short-txt",
+        "file":  "short-file.txt",
+        "mode":  "KEY_TERMS",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  2.26,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    },
+    {
+        "name":  "short-pdf",
+        "file":  "study-notes.pdf",
+        "mode":  "SHORT_SUMMARY",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  2.25,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    },
+    {
+        "name":  "short-pdf",
+        "file":  "study-notes.pdf",
+        "mode":  "DETAILED_SUMMARY",
+        "http_status":  502,
+        "status":  "FAILED",
+        "seconds":  1.41,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  "Лимит сервиса обработки текста исчерпан. Повторите запрос позже."
+    },
+    {
+        "name":  "short-pdf",
+        "file":  "study-notes.pdf",
+        "mode":  "DETAILED_SUMMARY",
+        "http_status":  502,
+        "status":  "FAILED",
+        "seconds":  1.72,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  "Лимит сервиса обработки текста исчерпан. Повторите запрос позже."
+    },
+    {
+        "recorded_at":  "2026-11-23T11:48:00.6241533+03:00",
+        "name":  "short-pdf",
+        "file":  "study-notes.pdf",
+        "mode":  "DETAILED_SUMMARY",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  4.15,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    },
+    {
+        "recorded_at":  "2026-11-23T11:49:08.6525280+03:00",
+        "name":  "short-pdf",
+        "file":  "study-notes.pdf",
+        "mode":  "SIMPLE_EXPLANATION",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  2.99,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    },
+    {
+        "recorded_at":  "2026-11-23T11:50:15.3463073+03:00",
+        "name":  "short-pdf",
+        "file":  "study-notes.pdf",
+        "mode":  "SELF_CHECK_QUESTIONS",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  1.66,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    },
+    {
+        "recorded_at":  "2026-11-23T11:51:22.9149881+03:00",
+        "name":  "short-pdf",
+        "file":  "study-notes.pdf",
+        "mode":  "KEY_TERMS",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  2.53,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    }
 ]

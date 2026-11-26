@@ -1,0 +1,926 @@
+{
+  "checked_at": "2026-11-26T12:57:34.660410+03:00",
+  "base_url": "http://localhost:18099",
+  "checks": [
+    {
+      "name": "health",
+      "path": "/health",
+      "expected": 200,
+      "actual": 200,
+      "passed": true,
+      "seconds": 0.016,
+      "content_type": "application/json",
+      "response": {
+        "status": "ok"
+      }
+    },
+    {
+      "name": "modes",
+      "path": "/api/v1/modes",
+      "expected": 200,
+      "actual": 200,
+      "passed": true,
+      "seconds": 0.004,
+      "content_type": "application/json",
+      "response": [
+        "SHORT_SUMMARY",
+        "DETAILED_SUMMARY",
+        "SIMPLE_EXPLANATION",
+        "SELF_CHECK_QUESTIONS",
+        "KEY_TERMS"
+      ]
+    },
+    {
+      "name": "unknown-job",
+      "path": "/api/v1/jobs/not-found-5961",
+      "expected": 404,
+      "actual": 404,
+      "passed": true,
+      "seconds": 0.006,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Not Found",
+        "instance": "/api/v1/jobs/not-found-5961",
+        "type": "about:blank",
+        "status": 404,
+        "detail": "Задание не найдено или срок хранения истёк. Отправьте материал заново."
+      }
+    },
+    {
+      "name": "process-blank",
+      "path": "/api/v1/text/process",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.006,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/text/process",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Текст не должен быть пустым."
+      }
+    },
+    {
+      "name": "process-unknown-mode",
+      "path": "/api/v1/text/process",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.01,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/text/process",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Неподдерживаемый режим обработки."
+      }
+    },
+    {
+      "name": "process-missing-text",
+      "path": "/api/v1/text/process",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.006,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/text/process",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Запрос должен содержать только поля text и mode."
+      }
+    },
+    {
+      "name": "process-missing-mode",
+      "path": "/api/v1/text/process",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.011,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/text/process",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Запрос должен содержать только поля text и mode."
+      }
+    },
+    {
+      "name": "process-number-text",
+      "path": "/api/v1/text/process",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.007,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/text/process",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Поле text должно быть строкой."
+      }
+    },
+    {
+      "name": "process-number-mode",
+      "path": "/api/v1/text/process",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.006,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/text/process",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Поле mode должно быть строкой."
+      }
+    },
+    {
+      "name": "process-null-body",
+      "path": "/api/v1/text/process",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.009,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/text/process",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Некорректный JSON или неверная структура запроса."
+      }
+    },
+    {
+      "name": "process-extra-field",
+      "path": "/api/v1/text/process",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.011,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/text/process",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Запрос должен содержать только поля text и mode."
+      }
+    },
+    {
+      "name": "process-content-type",
+      "path": "/api/v1/text/process",
+      "expected": 415,
+      "actual": 415,
+      "passed": true,
+      "seconds": 0.007,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Unsupported Media Type",
+        "instance": "/api/v1/text/process",
+        "type": "about:blank",
+        "status": 415,
+        "detail": "Неподдерживаемый Content-Type запроса."
+      }
+    },
+    {
+      "name": "process-broken-json",
+      "path": "/api/v1/text/process",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.007,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/text/process",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Некорректный JSON или неверная структура запроса."
+      }
+    },
+    {
+      "name": "process-character-limit",
+      "path": "/api/v1/text/process",
+      "expected": 413,
+      "actual": 413,
+      "passed": true,
+      "seconds": 0.009,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Payload Too Large",
+        "instance": "/api/v1/text/process",
+        "type": "about:blank",
+        "status": 413,
+        "detail": "Максимальная длина текста — 10000 символов."
+      }
+    },
+    {
+      "name": "text-blank",
+      "path": "/api/v1/jobs/text",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.007,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/jobs/text",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Передайте непустой text и корректный mode."
+      }
+    },
+    {
+      "name": "text-unknown-mode",
+      "path": "/api/v1/jobs/text",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.009,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/jobs/text",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Неподдерживаемый режим обработки."
+      }
+    },
+    {
+      "name": "text-missing-text",
+      "path": "/api/v1/jobs/text",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.006,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/jobs/text",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Передайте только строки text и mode."
+      }
+    },
+    {
+      "name": "text-missing-mode",
+      "path": "/api/v1/jobs/text",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.006,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/jobs/text",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Передайте только строки text и mode."
+      }
+    },
+    {
+      "name": "text-number-text",
+      "path": "/api/v1/jobs/text",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.006,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/jobs/text",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Передайте только строки text и mode."
+      }
+    },
+    {
+      "name": "text-number-mode",
+      "path": "/api/v1/jobs/text",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.004,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/jobs/text",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Передайте только строки text и mode."
+      }
+    },
+    {
+      "name": "text-null-body",
+      "path": "/api/v1/jobs/text",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.005,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/jobs/text",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Некорректный JSON или неверная структура запроса."
+      }
+    },
+    {
+      "name": "text-extra-field",
+      "path": "/api/v1/jobs/text",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.006,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/jobs/text",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Передайте только строки text и mode."
+      }
+    },
+    {
+      "name": "text-content-type",
+      "path": "/api/v1/jobs/text",
+      "expected": 415,
+      "actual": 415,
+      "passed": true,
+      "seconds": 0.006,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Unsupported Media Type",
+        "instance": "/api/v1/jobs/text",
+        "type": "about:blank",
+        "status": 415,
+        "detail": "Неподдерживаемый Content-Type запроса."
+      }
+    },
+    {
+      "name": "text-broken-json",
+      "path": "/api/v1/jobs/text",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.01,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/jobs/text",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Некорректный JSON или неверная структура запроса."
+      }
+    },
+    {
+      "name": "text-character-limit",
+      "path": "/api/v1/jobs/text",
+      "expected": 413,
+      "actual": 413,
+      "passed": true,
+      "seconds": 0.007,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Payload Too Large",
+        "instance": "/api/v1/jobs/text",
+        "type": "about:blank",
+        "status": 413,
+        "detail": "Материал превышает лимит символов."
+      }
+    },
+    {
+      "name": "background-token-limit",
+      "path": "/api/v1/jobs/text",
+      "expected": 413,
+      "actual": 413,
+      "passed": true,
+      "seconds": 0.014,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Payload Too Large",
+        "instance": "/api/v1/jobs/text",
+        "type": "about:blank",
+        "status": 413,
+        "detail": "Материал превышает лимит токенов."
+      }
+    },
+    {
+      "name": "short-needs-sync",
+      "path": "/api/v1/jobs/text",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.011,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/jobs/text",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Короткий материал отправьте через /api/v1/text/process или /api/v1/materials/process."
+      }
+    },
+    {
+      "name": "sync-file-empty",
+      "path": "/api/v1/materials/process",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.009,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/materials/process",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Файл пуст или не был передан"
+      }
+    },
+    {
+      "name": "sync-file-blank",
+      "path": "/api/v1/materials/process",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.011,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/materials/process",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Файл пуст или не содержит текста."
+      }
+    },
+    {
+      "name": "sync-file-two-files",
+      "path": "/api/v1/materials/process",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.016,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/materials/process",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Передайте ровно один файл (TXT или PDF)."
+      }
+    },
+    {
+      "name": "sync-file-unsupported",
+      "path": "/api/v1/materials/process",
+      "expected": 415,
+      "actual": 415,
+      "passed": true,
+      "seconds": 0.007,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Unsupported Media Type",
+        "instance": "/api/v1/materials/process",
+        "type": "about:blank",
+        "status": 415,
+        "detail": "Принят неподдерживаемый формат файла. Ожидался TXT или PDF."
+      }
+    },
+    {
+      "name": "sync-file-fake-pdf",
+      "path": "/api/v1/materials/process",
+      "expected": 415,
+      "actual": 415,
+      "passed": true,
+      "seconds": 0.01,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Unsupported Media Type",
+        "instance": "/api/v1/materials/process",
+        "type": "about:blank",
+        "status": 415,
+        "detail": "Содержимое файла не соответствует формату TXT или PDF."
+      }
+    },
+    {
+      "name": "sync-file-renamed-pdf",
+      "path": "/api/v1/materials/process",
+      "expected": 415,
+      "actual": 415,
+      "passed": true,
+      "seconds": 0.006,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Unsupported Media Type",
+        "instance": "/api/v1/materials/process",
+        "type": "about:blank",
+        "status": 415,
+        "detail": "Содержимое файла не соответствует формату TXT или PDF."
+      }
+    },
+    {
+      "name": "sync-file-scan",
+      "path": "/api/v1/materials/process",
+      "expected": 422,
+      "actual": 422,
+      "passed": true,
+      "seconds": 1.09,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Unprocessable Entity",
+        "instance": "/api/v1/materials/process",
+        "type": "about:blank",
+        "status": 422,
+        "detail": "PDF-файл не содержит текстового слоя (возможно, это скан). Загрузите PDF с распознаваемым текстом или TXT-файл."
+      }
+    },
+    {
+      "name": "sync-file-password",
+      "path": "/api/v1/materials/process",
+      "expected": 422,
+      "actual": 422,
+      "passed": true,
+      "seconds": 0.712,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Unprocessable Entity",
+        "instance": "/api/v1/materials/process",
+        "type": "about:blank",
+        "status": 422,
+        "detail": "PDF-файл защищён паролем. Снимите защиту и загрузите файл снова."
+      }
+    },
+    {
+      "name": "sync-file-corrupted",
+      "path": "/api/v1/materials/process",
+      "expected": 422,
+      "actual": 422,
+      "passed": true,
+      "seconds": 0.633,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Unprocessable Entity",
+        "instance": "/api/v1/materials/process",
+        "type": "about:blank",
+        "status": 422,
+        "detail": "PDF-файл повреждён и не может быть прочитан. Проверьте файл и загрузите снова."
+      }
+    },
+    {
+      "name": "sync-file-file-size",
+      "path": "/api/v1/materials/process",
+      "expected": 413,
+      "actual": 413,
+      "passed": true,
+      "seconds": 0.064,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Payload Too Large",
+        "instance": "/api/v1/materials/process",
+        "type": "about:blank",
+        "status": 413,
+        "detail": "Максимальный размер файла — 10 МиБ, запроса — 30 МиБ."
+      }
+    },
+    {
+      "name": "sync-file-character-limit",
+      "path": "/api/v1/materials/process",
+      "expected": 413,
+      "actual": 413,
+      "passed": true,
+      "seconds": 0.007,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Payload Too Large",
+        "instance": "/api/v1/materials/process",
+        "type": "about:blank",
+        "status": 413,
+        "detail": "Текст в файле превышает максимальную длину в 10000 символов."
+      }
+    },
+    {
+      "name": "sync-file-missing-file",
+      "path": "/api/v1/materials/process",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.01,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/materials/process",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Передайте TXT-файл в поле file."
+      }
+    },
+    {
+      "name": "sync-file-wrong-field",
+      "path": "/api/v1/materials/process",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.008,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/materials/process",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Передайте TXT-файл в поле file."
+      }
+    },
+    {
+      "name": "sync-file-missing-mode",
+      "path": "/api/v1/materials/process",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.004,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/materials/process",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Передайте режим обработки в поле mode."
+      }
+    },
+    {
+      "name": "sync-file-unknown-mode",
+      "path": "/api/v1/materials/process",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.005,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/materials/process",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Неподдерживаемый режим обработки."
+      }
+    },
+    {
+      "name": "jobs-file-empty",
+      "path": "/api/v1/jobs/materials",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.005,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/jobs/materials",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Передайте ровно один непустой TXT или PDF."
+      }
+    },
+    {
+      "name": "jobs-file-blank",
+      "path": "/api/v1/jobs/materials",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.006,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/jobs/materials",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Файл пуст или не содержит текста."
+      }
+    },
+    {
+      "name": "jobs-file-two-files",
+      "path": "/api/v1/jobs/materials",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.006,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/jobs/materials",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Передайте ровно один непустой TXT или PDF."
+      }
+    },
+    {
+      "name": "jobs-file-unsupported",
+      "path": "/api/v1/jobs/materials",
+      "expected": 415,
+      "actual": 415,
+      "passed": true,
+      "seconds": 0.007,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Unsupported Media Type",
+        "instance": "/api/v1/jobs/materials",
+        "type": "about:blank",
+        "status": 415,
+        "detail": "Принят неподдерживаемый формат файла. Ожидался TXT или PDF."
+      }
+    },
+    {
+      "name": "jobs-file-fake-pdf",
+      "path": "/api/v1/jobs/materials",
+      "expected": 415,
+      "actual": 415,
+      "passed": true,
+      "seconds": 0.01,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Unsupported Media Type",
+        "instance": "/api/v1/jobs/materials",
+        "type": "about:blank",
+        "status": 415,
+        "detail": "Содержимое файла не соответствует формату TXT или PDF."
+      }
+    },
+    {
+      "name": "jobs-file-renamed-pdf",
+      "path": "/api/v1/jobs/materials",
+      "expected": 415,
+      "actual": 415,
+      "passed": true,
+      "seconds": 0.008,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Unsupported Media Type",
+        "instance": "/api/v1/jobs/materials",
+        "type": "about:blank",
+        "status": 415,
+        "detail": "Содержимое файла не соответствует формату TXT или PDF."
+      }
+    },
+    {
+      "name": "jobs-file-scan",
+      "path": "/api/v1/jobs/materials",
+      "expected": 422,
+      "actual": 422,
+      "passed": true,
+      "seconds": 0.894,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Unprocessable Entity",
+        "instance": "/api/v1/jobs/materials",
+        "type": "about:blank",
+        "status": 422,
+        "detail": "PDF-файл не содержит текстового слоя (возможно, это скан). Загрузите PDF с распознаваемым текстом или TXT-файл."
+      }
+    },
+    {
+      "name": "jobs-file-password",
+      "path": "/api/v1/jobs/materials",
+      "expected": 422,
+      "actual": 422,
+      "passed": true,
+      "seconds": 0.712,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Unprocessable Entity",
+        "instance": "/api/v1/jobs/materials",
+        "type": "about:blank",
+        "status": 422,
+        "detail": "PDF-файл защищён паролем. Снимите защиту и загрузите файл снова."
+      }
+    },
+    {
+      "name": "jobs-file-corrupted",
+      "path": "/api/v1/jobs/materials",
+      "expected": 422,
+      "actual": 422,
+      "passed": true,
+      "seconds": 0.703,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Unprocessable Entity",
+        "instance": "/api/v1/jobs/materials",
+        "type": "about:blank",
+        "status": 422,
+        "detail": "PDF-файл повреждён и не может быть прочитан. Проверьте файл и загрузите снова."
+      }
+    },
+    {
+      "name": "jobs-file-file-size",
+      "path": "/api/v1/jobs/materials",
+      "expected": 413,
+      "actual": 413,
+      "passed": true,
+      "seconds": 0.064,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Payload Too Large",
+        "instance": "/api/v1/jobs/materials",
+        "type": "about:blank",
+        "status": 413,
+        "detail": "Максимальный размер файла — 10 МиБ, запроса — 30 МиБ."
+      }
+    },
+    {
+      "name": "jobs-file-character-limit",
+      "path": "/api/v1/jobs/materials",
+      "expected": 413,
+      "actual": 413,
+      "passed": true,
+      "seconds": 0.009,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Payload Too Large",
+        "instance": "/api/v1/jobs/materials",
+        "type": "about:blank",
+        "status": 413,
+        "detail": "Текст в файле превышает максимальную длину в 24000 символов."
+      }
+    },
+    {
+      "name": "jobs-file-missing-file",
+      "path": "/api/v1/jobs/materials",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.005,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/jobs/materials",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Передайте TXT-файл в поле file."
+      }
+    },
+    {
+      "name": "jobs-file-wrong-field",
+      "path": "/api/v1/jobs/materials",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.007,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/jobs/materials",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Передайте TXT-файл в поле file."
+      }
+    },
+    {
+      "name": "jobs-file-missing-mode",
+      "path": "/api/v1/jobs/materials",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.007,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/jobs/materials",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Передайте режим обработки в поле mode."
+      }
+    },
+    {
+      "name": "jobs-file-unknown-mode",
+      "path": "/api/v1/jobs/materials",
+      "expected": 400,
+      "actual": 400,
+      "passed": true,
+      "seconds": 0.006,
+      "content_type": "application/problem+json",
+      "response": {
+        "title": "Bad Request",
+        "instance": "/api/v1/jobs/materials",
+        "type": "about:blank",
+        "status": 400,
+        "detail": "Неподдерживаемый режим обработки."
+      }
+    },
+    {
+      "name": "health-after-errors",
+      "path": "/health",
+      "expected": 200,
+      "actual": 200,
+      "passed": true,
+      "seconds": 0.004,
+      "content_type": "application/json",
+      "response": {
+        "status": "ok"
+      }
+    }
+  ]
+}

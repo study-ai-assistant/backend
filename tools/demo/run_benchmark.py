@@ -8,8 +8,8 @@ import urllib.error
 from pathlib import Path
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--base-url', default='http://localhost:18097')
-parser.add_argument('--suite', choices=['long', 'demo'], default='long')
+parser.add_argument('--base-url', default='http://localhost:8080')
+parser.add_argument('--suite', choices=['long', 'demo', 'acceptance', 'recording'], default='long')
 parser.add_argument('--case', help='Повторить только указанный name из measurements.json')
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--mode', choices=['SHORT_SUMMARY','DETAILED_SUMMARY','SIMPLE_EXPLANATION',
@@ -21,7 +21,10 @@ if args.mode:
     modes = [args.mode]
 args.output.mkdir(parents=True, exist_ok=True)
 log = args.output / 'measurements.json'
-records = json.loads(log.read_text()) if log.exists() else []
+records = json.loads(log.read_text(encoding='utf-8')) if log.exists() else []
+if records:
+    # Предыдущий процесс мог оставить занятое минутное окно.
+    time.sleep(61)
 
 def call(path, data=None, content_type='application/json'):
     request = urllib.request.Request(args.base_url+path, data=data,
@@ -48,21 +51,31 @@ else:
     cases = [('short-text', 'short-text.txt', 'text', False),
              ('short-txt', 'short-file.txt', 'file', False),
              ('short-pdf', 'study-notes.pdf', 'file', False)]
+    if args.suite in ['acceptance', 'recording']:
+        cases.append(('long-txt', 'long-lecture.txt', 'file', True))
+    if args.suite == 'acceptance':
+        cases.append(('long-pdf', 'long-lecture.pdf', 'file', True))
 short_calls = 0
 for name, filename, kind, background in cases:
     if args.case and name != args.case:
         continue
-    for mode in modes:
+    case_modes = ['SHORT_SUMMARY'] if (args.suite == 'recording' and name != 'short-text'
+                                      and not args.mode) else modes
+    for mode in case_modes:
         if any(r['name'] == name and r['mode'] == mode and r.get('status') == 'SUCCEEDED' for r in records):
             continue
         if not background and short_calls and short_calls % 3 == 0:
             time.sleep(61)
         path = root/'docs/demo'/filename
+        if background and short_calls:
+            # Не начинать фоновые задания сразу после заполнения минутной квоты короткими.
+            time.sleep(61)
+            short_calls = 0
         start = time.monotonic()
         if kind == 'file':
             code, body = send_file(path, mode, '/api/v1/jobs/materials' if background else '/api/v1/materials/process')
         else:
-            data = json.dumps({'text': path.read_text(), 'mode': mode}).encode()
+            data = json.dumps({'text': path.read_text(encoding='utf-8'), 'mode': mode}).encode()
             code, body = call('/api/v1/jobs/text' if background else '/api/v1/text/process', data)
         transitions = []
         if code == 202:
@@ -72,6 +85,8 @@ for name, filename, kind, background in cases:
                 state = [body['status'],body['stage'],body['completedParts'],body['totalParts']]
                 if not transitions or transitions[-1] != state:
                     transitions.append(state)
+                    print(json.dumps({'name': name, 'mode': mode, 'job_id': job_id,
+                                      'progress': state}, ensure_ascii=False), flush=True)
                 if body['status'] in ['SUCCEEDED', 'FAILED']:
                     break
                 if time.monotonic()-start > 1200:
@@ -85,9 +100,9 @@ for name, filename, kind, background in cases:
                   'error':body.get('error',body.get('detail'))}
         answer_file = args.output/(name+'-'+mode+'.txt')
         if success:
-            answer_file.write_text(body['result']+'\n')
+            answer_file.write_text(body['result']+'\n', encoding='utf-8')
         records.append(record)
-        log.write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n')
+        log.write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n', encoding='utf-8')
         print(json.dumps(record,ensure_ascii=False),flush=True)
         if not background:
             short_calls += 1

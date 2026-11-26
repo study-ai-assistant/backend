@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -21,6 +22,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,11 +69,18 @@ class LongMaterialHttpTests {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"txt", "pdf"})
-    void acceptsLongFiles(String extension) throws Exception {
+    @MethodSource("longFileModes")
+    void acceptsLongFiles(String extension, ProcessingMode mode) throws Exception {
         byte[] bytes = extension.equals("txt") ? LONG.getBytes(StandardCharsets.UTF_8) : pdf();
-        assertThat(await(file(bytes, extension)).path("status").asText()).isEqualTo("SUCCEEDED");
+        JsonNode result = await(file(bytes, extension, mode.name()));
+        assertThat(result.path("status").asText()).isEqualTo("SUCCEEDED");
+        assertThat(result.path("mode").asText()).isEqualTo(mode.name());
         assertThat(llm.chunks.get()).isGreaterThan(1);
+    }
+
+    static Stream<Arguments> longFileModes() {
+        return Stream.of("txt", "pdf").flatMap(extension ->
+                Stream.of(ProcessingMode.values()).map(mode -> Arguments.of(extension, mode)));
     }
 
     @Test
@@ -158,13 +168,17 @@ class LongMaterialHttpTests {
     }
 
     private HttpResponse<String> file(byte[] data, String extension) throws Exception {
+        return file(data, extension, "SHORT_SUMMARY");
+    }
+
+    private HttpResponse<String> file(byte[] data, String extension, String mode) throws Exception {
         var body = new ByteArrayOutputStream();
         body.write(("--testboundary\r\nContent-Disposition: form-data; name=\"file\"; filename=\"long."
                 + extension + "\"\r\nContent-Type: application/octet-stream\r\n\r\n")
                 .getBytes(StandardCharsets.UTF_8));
         body.write(data);
         body.write(("\r\n--testboundary\r\nContent-Disposition: form-data; name=\"mode\"\r\n\r\n"
-                + "SHORT_SUMMARY\r\n--testboundary--\r\n").getBytes(StandardCharsets.UTF_8));
+                + mode + "\r\n--testboundary--\r\n").getBytes(StandardCharsets.UTF_8));
         return send(HttpRequest.newBuilder(uri("/api/v1/jobs/materials"))
                 .header("Content-Type", "multipart/form-data; boundary=testboundary")
                 .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray())));

@@ -1,0 +1,82 @@
+[
+    {
+        "recorded_at":  "2026-11-23T12:01:09.3880093+03:00",
+        "name":  "short-pdf",
+        "file":  "study-notes.pdf",
+        "mode":  "SHORT_SUMMARY",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  3.58,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    },
+    {
+        "recorded_at":  "2026-11-23T12:02:16.5746570+03:00",
+        "name":  "short-pdf",
+        "file":  "study-notes.pdf",
+        "mode":  "DETAILED_SUMMARY",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  2.12,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    },
+    {
+        "recorded_at":  "2026-11-23T12:03:24.0207832+03:00",
+        "name":  "short-pdf",
+        "file":  "study-notes.pdf",
+        "mode":  "SIMPLE_EXPLANATION",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  2.42,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    },
+    {
+        "recorded_at":  "2026-11-23T12:04:31.6717281+03:00",
+        "name":  "short-pdf",
+        "file":  "study-notes.pdf",
+        "mode":  "SELF_CHECK_QUESTIONS",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  2.62,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    },
+    {
+        "recorded_at":  "2026-11-23T12:05:40.5925950+03:00",
+        "name":  "short-pdf",
+        "file":  "study-notes.pdf",
+        "mode":  "KEY_TERMS",
+        "http_status":  200,
+        "status":  "SUCCEEDED",
+        "seconds":  3.9,
+        "parts":  1,
+        "prompt_tokens":  null,
+        "completion_tokens":  null,
+        "transitions":  [
+
+                        ],
+        "error":  null
+    }
+]

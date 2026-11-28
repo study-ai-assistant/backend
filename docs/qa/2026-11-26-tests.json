@@ -1,0 +1,340 @@
+{
+  "checked_at": "2026-11-26T13:34:01.561930+03:00",
+  "totals": {
+    "tests": 149,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1
+  },
+  "suites": [
+    {
+      "name": "ru.studyassistant.backend.BackendApplicationTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.684,
+      "cases": [
+        "healthAndModesAreAvailableWithoutLlmCredentials"
+      ]
+    },
+    {
+      "name": "ru.studyassistant.backend.MaterialProcessingTests",
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.684,
+      "cases": [
+        "processesAllModes(ProcessingMode)[1]",
+        "processesAllModes(ProcessingMode)[2]",
+        "processesAllModes(ProcessingMode)[3]",
+        "processesAllModes(ProcessingMode)[4]",
+        "processesAllModes(ProcessingMode)[5]",
+        "rejectsInvalidUploadsBeforeLlm(String, byte[], String, String, int)[1]",
+        "rejectsInvalidUploadsBeforeLlm(String, byte[], String, String, int)[2]",
+        "rejectsInvalidUploadsBeforeLlm(String, byte[], String, String, int)[3]",
+        "rejectsInvalidUploadsBeforeLlm(String, byte[], String, String, int)[4]",
+        "rejectsInvalidUploadsBeforeLlm(String, byte[], String, String, int)[5]",
+        "rejectsInvalidUploadsBeforeLlm(String, byte[], String, String, int)[6]",
+        "rejectsInvalidUploadsBeforeLlm(String, byte[], String, String, int)[7]",
+        "rejectsInvalidUploadsBeforeLlm(String, byte[], String, String, int)[8]",
+        "stripsUtf8Bom",
+        "rejectsSeveralFiles",
+        "acceptsUnicodeLimitIncludingEmoji",
+        "preservesRussianText(String)[1]",
+        "preservesRussianText(String)[2]",
+        "returns502WhenProviderFails(Reason, String)[1]",
+        "returns502WhenProviderFails(Reason, String)[2]",
+        "returns502WhenProviderFails(Reason, String)[3]"
+      ]
+    },
+    {
+      "name": "ru.studyassistant.backend.OpenApiContractTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.291,
+      "cases": [
+        "openApiIsValidAndLocalReferencesResolve"
+      ]
+    },
+    {
+      "name": "ru.studyassistant.backend.PdfProcessingTests",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 18.619,
+      "cases": [
+        "rejectsPageAndTextLimitsWithoutTruncation",
+        "processesDatasetDocuments(String, String)[1]",
+        "processesDatasetDocuments(String, String)[2]",
+        "processesDatasetDocuments(String, String)[3]",
+        "configuredTimeoutReturns504AndServerKeepsWorking",
+        "processesRussianPdfInEveryMode(ProcessingMode)[1]",
+        "processesRussianPdfInEveryMode(ProcessingMode)[2]",
+        "processesRussianPdfInEveryMode(ProcessingMode)[3]",
+        "processesRussianPdfInEveryMode(ProcessingMode)[4]",
+        "processesRussianPdfInEveryMode(ProcessingMode)[5]",
+        "pdfLlmFailureIs502",
+        "configuredPageLimitIsUsed",
+        "doesNotLogFileContents(CapturedOutput)",
+        "checksContentInsteadOfTrustingFilename",
+        "acceptsExactly50Pages",
+        "rejectsScansPasswordsAndCorruption",
+        "rejectsDatasetDocumentsBeforeLlm(String, CapturedOutput)[1]",
+        "rejectsDatasetDocumentsBeforeLlm(String, CapturedOutput)[2]",
+        "rejectsDatasetDocumentsBeforeLlm(String, CapturedOutput)[3]",
+        "preservesPageOrder"
+      ]
+    },
+    {
+      "name": "ru.studyassistant.backend.TextProcessingTests",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 5.04,
+      "cases": [
+        "processesAllModes(ProcessingMode)[1]",
+        "processesAllModes(ProcessingMode)[2]",
+        "processesAllModes(ProcessingMode)[3]",
+        "processesAllModes(ProcessingMode)[4]",
+        "processesAllModes(ProcessingMode)[5]",
+        "handlesLlmFailure(Reason, String)[1]",
+        "handlesLlmFailure(Reason, String)[2]",
+        "handlesLlmFailure(Reason, String)[3]",
+        "rejectsInvalidRequests(String, int)[1]",
+        "rejectsInvalidRequests(String, int)[2]",
+        "rejectsInvalidRequests(String, int)[3]",
+        "rejectsInvalidRequests(String, int)[4]",
+        "rejectsInvalidRequests(String, int)[5]",
+        "rejectsInvalidRequests(String, int)[6]",
+        "rejectsInvalidRequests(String, int)[7]",
+        "rejectsInvalidRequests(String, int)[8]",
+        "rejectsInvalidRequests(String, int)[9]",
+        "rejectsInvalidRequests(String, int)[10]",
+        "rejectsInvalidRequests(String, int)[11]",
+        "rejectsInvalidRequests(String, int)[12]"
+      ]
+    },
+    {
+      "name": "ru.studyassistant.backend.jobs.JobCapacityHttpTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 1.534,
+      "cases": [
+        "returns503WhenFullAnd404AfterRetentionThenAcceptsNewJob"
+      ]
+    },
+    {
+      "name": "ru.studyassistant.backend.jobs.JobLifecycleTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.071,
+      "cases": [
+        "expiresResultsAndReleasesCapacityWithoutKeepingText"
+      ]
+    },
+    {
+      "name": "ru.studyassistant.backend.jobs.LongMaterialHttpTests",
+      "tests": 24,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 13.216,
+      "cases": [
+        "mergeFailureDoesNotExposePartialResult",
+        "acceptsLongFiles(String, ProcessingMode)[1]",
+        "acceptsLongFiles(String, ProcessingMode)[2]",
+        "acceptsLongFiles(String, ProcessingMode)[3]",
+        "acceptsLongFiles(String, ProcessingMode)[4]",
+        "acceptsLongFiles(String, ProcessingMode)[5]",
+        "acceptsLongFiles(String, ProcessingMode)[6]",
+        "acceptsLongFiles(String, ProcessingMode)[7]",
+        "acceptsLongFiles(String, ProcessingMode)[8]",
+        "acceptsLongFiles(String, ProcessingMode)[9]",
+        "acceptsLongFiles(String, ProcessingMode)[10]",
+        "rejectsCharacterAndTokenLimitsForJsonTxtAndPdf",
+        "unknownJobAndInvalidInputFollowContract",
+        "routesTokenDenseTextToBackgroundEvenBelowCharacterThreshold",
+        "exposesProgressAndProcessesJobsSequentially",
+        "returnsSafeErrorAndStopsAfterFailedChunk(String)[1]",
+        "returnsSafeErrorAndStopsAfterFailedChunk(String)[2]",
+        "returnsSafeErrorAndStopsAfterFailedChunk(String)[3]",
+        "shortMaterialsKeepSynchronousRoutes",
+        "completesChunksAndMergeInEveryMode(ProcessingMode)[1]",
+        "completesChunksAndMergeInEveryMode(ProcessingMode)[2]",
+        "completesChunksAndMergeInEveryMode(ProcessingMode)[3]",
+        "completesChunksAndMergeInEveryMode(ProcessingMode)[4]",
+        "completesChunksAndMergeInEveryMode(ProcessingMode)[5]"
+      ]
+    },
+    {
+      "name": "ru.studyassistant.backend.llm.GroqLlmClientTests",
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 62.319,
+      "cases": [
+        "sendsPromptForEachMode(ProcessingMode)[1]",
+        "sendsPromptForEachMode(ProcessingMode)[2]",
+        "sendsPromptForEachMode(ProcessingMode)[3]",
+        "sendsPromptForEachMode(ProcessingMode)[4]",
+        "sendsPromptForEachMode(ProcessingMode)[5]",
+        "handlesInvalidResponses(String)[1]",
+        "handlesInvalidResponses(String)[2]",
+        "handlesInvalidResponses(String)[3]",
+        "handlesInvalidResponses(String)[4]",
+        "handlesInvalidResponses(String)[5]",
+        "stopsWaitingAfterTimeout",
+        "rejectsTruncatedAnswerAndReadsUsage",
+        "logsOnlySafeDiagnosticsEvenAtDebugLevel",
+        "rejectsMissingKey",
+        "handlesProviderErrors(int, Reason)[1]",
+        "handlesProviderErrors(int, Reason)[2]",
+        "handlesProviderErrors(int, Reason)[3]",
+        "handlesProviderErrors(int, Reason)[4]",
+        "handlesProviderErrors(int, Reason)[5]",
+        "handlesProviderErrors(int, Reason)[6]",
+        "recordsActualTokensAndCapsCompletionBudget"
+      ]
+    },
+    {
+      "name": "ru.studyassistant.backend.llm.GroqQuotaTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.358,
+      "cases": [
+        "waitsForRollingWindowAcrossConcurrentRequests",
+        "synchronousCallDoesNotWaitBehindBackgroundWork",
+        "respectsDailyBudgetAndSingleRequestSize",
+        "countsRequestsAsWellAsTokens",
+        "reconcilesDailyReservationWithActualUsage"
+      ]
+    },
+    {
+      "name": "ru.studyassistant.backend.llm.LlmOutputFormatterTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.011,
+      "cases": [
+        "keepsCodeAndUnicodeInsideFences",
+        "stripsPresentationWithoutChangingExponentOrMath"
+      ]
+    },
+    {
+      "name": "ru.studyassistant.backend.llm.LlmPropertiesTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.9,
+      "cases": [
+        "bindsProviderModelAndKeyWithoutExposingSecretInToString",
+        "readsApplicationYamlPlaceholdersFromEnvironment",
+        "startsWithoutLlmCredentials"
+      ]
+    },
+    {
+      "name": "ru.studyassistant.backend.llm.LongMaterialPromptManualTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "seconds": 0.001,
+      "cases": [
+        "processesLongMaterial"
+      ]
+    },
+    {
+      "name": "ru.studyassistant.backend.material.MaterialServiceTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 1.751,
+      "cases": [
+        "shouldProcessValidUtf8File",
+        "shouldRejectNonTxtFile",
+        "shouldRejectEmptyFile",
+        "shouldRejectTooLargeFile",
+        "shouldProcessValidWindows1251File"
+      ]
+    },
+    {
+      "name": "ru.studyassistant.backend.material.PdfPropertiesTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.027,
+      "cases": [
+        "bindsLimitsFromConfiguration",
+        "rejectsInvalidLimits"
+      ]
+    },
+    {
+      "name": "ru.studyassistant.backend.material.PdfTextCleanerTests",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.047,
+      "cases": [
+        "removesConsecutivePageNumbersAboveRepeatedFooter",
+        "joinsWrappedLinesAndPreservesParagraphs",
+        "removesRepeatedHeadersAndFootersFromPageEdges",
+        "removesConsecutiveNumbersAtBottomOfPages",
+        "removesHyphenWhenJoinedWordOccursInDocument",
+        "preservesListAndTableLayout",
+        "removesSoftHyphenAtLineBreakAndInsideWord",
+        "returnsEmptyTextForBlankPages",
+        "preservesHyphenInCompoundWord",
+        "preservesHyphenWhenJoinedSpellingIsUnknown",
+        "preservesNumbersWhenSequenceIsTooShort"
+      ]
+    },
+    {
+      "name": "ru.studyassistant.backend.material.PdfTextExtractorTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 2.058,
+      "cases": [
+        "killsUncooperativeProcessCleansFilesAndReleasesSlot",
+        "cleansResourcesWhenProcessCannotStart"
+      ]
+    },
+    {
+      "name": "ru.studyassistant.backend.material.TextSplitterTests",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.086,
+      "cases": [
+        "rejectsTextOverEstimatedTokenLimit",
+        "packsWholeParagraphsInOrder",
+        "rejectsTextOverCharacterLimit",
+        "rejectsTextThatNeedsMoreThanSixParts",
+        "splitsLongParagraphBySentences",
+        "keepsShortTextUnchanged",
+        "splitsLongSentenceByWords",
+        "keepsWholeParagraphWhenSeparatorDoesNotFit"
+      ]
+    }
+  ]
+}

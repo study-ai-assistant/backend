@@ -1,0 +1,39 @@
+{
+  "checked_at": "2026-11-26T12:52:40.293179+03:00",
+  "branch": "59_61",
+  "baseline": "079dc7cf1fe9fb68d5effdb375b05a4126e46abb",
+  "main": "98e0a51b032d47d0312d2a2dc9c9d5cf2cd4d218",
+  "clean_clone": true,
+  "docker_compose": "5.6.1",
+  "docker_engine": "29.9.2",
+  "compose_build_and_healthy_seconds": 190.26,
+  "host_port": 18099,
+  "local_wifi_health": {
+    "status": 200,
+    "body": {
+      "status": "ok"
+    },
+    "performed_on": "laptop, not phone"
+  },
+  "container_non_root": true,
+  "env_file_absent_from_container": true,
+  "phone_test": "not performed: user requested laptop only",
+  "second_participant": "not performed",
+  "materials_sha256": {
+    "docs/demo/short-text.txt": "992fdb0ab08438077e705a2850cce83b55f57dfa665af1b0a6e83db7a5cbe310",
+    "docs/demo/short-file.txt": "5412a6f51151d1f0b9bb1fb1df8daa3460b8b6f8e683bd4867d39a582396bf6b",
+    "docs/demo/study-notes.pdf": "277131a68cf74b23a3355b83fd25f75ee1f8582aa13effde9fe864cacddfe003",
+    "docs/demo/long-lecture.txt": "8792cd269ec0178404d42e86d2c0310eda4ef636b46ea74ad562ee1fb0550a5a",
+    "docs/demo/long-lecture.pdf": "47ed9aa5055b0c7339b8a634e176786dfc9235f8ac63eccae376406feaaa369b"
+  },
+  "verify_launcher": "Maven bundled with IntelliJ IDEA",
+  "verify_command": "mvn --batch-mode verify",
+  "verify_result": "BUILD SUCCESS",
+  "verify_total_seconds": 119,
+  "verify_finished_at": "2026-11-26T12:54:12+03:00",
+  "cleanup": {
+    "temporary_container_stopped": true,
+    "temporary_clone_removed": true,
+    "finished_at": "2026-11-26T13:33:19.307456+03:00"
+  }
+}

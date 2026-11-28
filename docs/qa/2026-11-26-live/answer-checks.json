@@ -1,0 +1,170 @@
+{
+  "note": "Только формальные проверки, не оценка точности LLM.",
+  "checks": [
+    {
+      "file": "short-text-SHORT_SUMMARY.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "short-text-DETAILED_SUMMARY.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "short-text-SIMPLE_EXPLANATION.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "short-text-SELF_CHECK_QUESTIONS.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "question_count": 9,
+      "between_one_and_ten": true,
+      "no_exact_duplicates": true,
+      "passed": true
+    },
+    {
+      "file": "short-text-KEY_TERMS.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "short-txt-SHORT_SUMMARY.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "short-txt-DETAILED_SUMMARY.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "short-txt-SIMPLE_EXPLANATION.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "short-txt-SELF_CHECK_QUESTIONS.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "question_count": 9,
+      "between_one_and_ten": true,
+      "no_exact_duplicates": true,
+      "passed": true
+    },
+    {
+      "file": "short-txt-KEY_TERMS.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "short-pdf-SHORT_SUMMARY.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "short-pdf-DETAILED_SUMMARY.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "short-pdf-SIMPLE_EXPLANATION.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "short-pdf-SELF_CHECK_QUESTIONS.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "question_count": 10,
+      "between_one_and_ten": true,
+      "no_exact_duplicates": true,
+      "passed": true
+    },
+    {
+      "file": "short-pdf-KEY_TERMS.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "long-txt-SHORT_SUMMARY.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "long-txt-DETAILED_SUMMARY.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "long-txt-SIMPLE_EXPLANATION.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "long-txt-SELF_CHECK_QUESTIONS.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "question_count": 6,
+      "between_one_and_ten": true,
+      "no_exact_duplicates": true,
+      "passed": true
+    },
+    {
+      "file": "long-txt-KEY_TERMS.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "long-pdf-SHORT_SUMMARY.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "long-pdf-DETAILED_SUMMARY.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "long-pdf-SIMPLE_EXPLANATION.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    },
+    {
+      "file": "long-pdf-SELF_CHECK_QUESTIONS.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "question_count": 6,
+      "between_one_and_ten": true,
+      "no_exact_duplicates": true,
+      "passed": true
+    },
+    {
+      "file": "long-pdf-KEY_TERMS.txt",
+      "nonempty": true,
+      "no_service_markers": true,
+      "passed": true
+    }
+  ]
+}
